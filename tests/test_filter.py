@@ -1,5 +1,4 @@
 import unittest
-import json
 import os
 import tempfile
 import filterweb.filter

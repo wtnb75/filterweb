@@ -77,7 +77,6 @@ class TestInput(unittest.TestCase):
 
     def test_sqlite3(self):
         with tempfile.NamedTemporaryFile("r+") as tf:
-            print("db", tf.name)
             db = sqlite3.connect(tf.name)
             cur = db.cursor()
             cur.execute("create table tbl1 (id int, val varchar)")
@@ -93,7 +92,6 @@ class TestInput(unittest.TestCase):
 
     def test_sqlite3_ro(self):
         with tempfile.NamedTemporaryFile("r+") as tf:
-            print("db", tf.name)
             db = sqlite3.connect(tf.name)
             cur = db.cursor()
             cur.execute("create table tbl1 (id int, val varchar)")

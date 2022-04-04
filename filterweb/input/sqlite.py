@@ -9,6 +9,8 @@ from dataclasses import field
 class InputSQLite3Arg:
     database: str
     query: str
+    read_only: bool = True
+    connect_params: dict = field(default_factory=dict)
     params: list[str] = field(default_factory=list)
 
 
@@ -17,8 +19,12 @@ class InputSQLite3(InputBase):
 
     def __init__(self, config):
         super().__init__(config)
-        self.db = sqlite3.connect(
-            f"file:{self.config.database}?mode=ro", uri=True)
+        if self.config.read_only:
+            self.db = sqlite3.connect(
+                f"file:{self.config.database}?mode=ro", uri=True, **self.config.connect_params)
+        else:
+            self.db = sqlite3.connect(
+                self.config.database, **self.config.connect_params)
 
     def read(self) -> list[dict]:
         cur = self.db.execute(self.config.query, self.config.params)

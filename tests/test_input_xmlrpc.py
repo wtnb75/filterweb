@@ -1,9 +1,5 @@
 import unittest
-import os
 import threading
-import json
-import time
-import tempfile
 import filterweb.input
 from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 

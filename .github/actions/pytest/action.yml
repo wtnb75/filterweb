@@ -1,0 +1,19 @@
+runs:
+  using: "composite"
+  steps:
+  - name: setup python 3.10
+    uses: actions/setup-python@v3
+    with:
+      python-version: '3.x'
+  - name: pip install
+    run: pip install -r requirements.txt -r requirements-dev.txt
+    shell: bash
+  - name: lint
+    run: flake8 --max-line-length=120 filterweb tests
+    shell: bash
+  - name: test
+    run: PYTHONPATH=. pytest -xs --ff
+    shell: bash
+  - name: build
+    run: python setup.py bdist_wheel
+    shell: bash

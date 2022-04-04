@@ -1,0 +1,12 @@
+name: branch
+
+on:
+  push:
+    branches-ignore: [main, gh-pages]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: ./.github/actions/pytest

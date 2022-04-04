@@ -1,0 +1,18 @@
+runs:
+  using: "composite"
+  steps:
+  - name: mkdir
+    run: mkdir publish
+    shell: bash
+  - name: copy dist
+    run: cp -r dist/ publish/dist/
+    shell: bash
+  - name: copy coverage html
+    run: cp -r cover/ publish/cover/
+    shell: bash
+  - name: install pip2pi
+    run: pip install pip2pi
+    shell: bash
+  - name: pypi index
+    run: dir2pi -S publish/dist
+    shell: bash
