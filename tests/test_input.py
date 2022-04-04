@@ -1,4 +1,5 @@
 import unittest
+import os
 import json
 import tempfile
 import sqlite3
@@ -76,6 +77,7 @@ class TestInput(unittest.TestCase):
 
     def test_sqlite3(self):
         with tempfile.NamedTemporaryFile("r+") as tf:
+            print("db", tf.name)
             db = sqlite3.connect(tf.name)
             cur = db.cursor()
             cur.execute("create table tbl1 (id int, val varchar)")
@@ -88,3 +90,37 @@ class TestInput(unittest.TestCase):
             ifp = filterweb.input.InputSQLite3(conf)
             res = ifp.process()
             self.assertEqual("world", res)
+
+    def test_sqlite3_ro(self):
+        with tempfile.NamedTemporaryFile("r+") as tf:
+            print("db", tf.name)
+            db = sqlite3.connect(tf.name)
+            cur = db.cursor()
+            cur.execute("create table tbl1 (id int, val varchar)")
+            ins = "insert into tbl1 (id, val) values (?, ?)"
+            cur.executemany(ins, [(1, "hello"), (2, "world")])
+            db.commit()
+            db.close()
+            conf = {"database": tf.name,
+                    "query": "update tbl1 set val='abc' where id==1"}
+            with self.assertRaises(sqlite3.OperationalError) as e:
+                ifp = filterweb.input.InputSQLite3(conf)
+                ifp.process()
+            self.assertIn("readonly database", e.exception.args[0])
+
+
+ssh_host = os.getenv("INPUT_SSH_HOST", None)
+
+
+@unittest.skipUnless(ssh_host, "no ssh host")
+class TestInputSSH(unittest.TestCase):
+    def test_ssh(self):
+        conf = {
+            "hostname": ssh_host,
+            "command": """echo '{"hello": "world"}'""",
+            "params": json.loads(os.getenv("INPUT_SSH_PARAMS", "{}")),
+            "parse": "json",
+        }
+        ifp = filterweb.input.InputSSH(conf)
+        res = ifp.process()
+        self.assertEqual({"hello": "world"}, res)

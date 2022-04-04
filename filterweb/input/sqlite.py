@@ -17,9 +17,10 @@ class InputSQLite3(InputBase):
 
     def __init__(self, config):
         super().__init__(config)
-        self.db = sqlite3.connect(self.config.database)
+        self.db = sqlite3.connect(
+            f"file:{self.config.database}?mode=ro", uri=True)
 
-    def read(self) -> dict:
+    def read(self) -> list[dict]:
         cur = self.db.execute(self.config.query, self.config.params)
         keys = [x[0] for x in cur.description]
         return [dict(zip(keys, x)) for x in cur.fetchall()]
