@@ -14,11 +14,14 @@ runs:
   - name: pip install
     run: pip install -r requirements.txt -r requirements-dev.txt
     shell: bash
+  - name: install gh-actions modules
+    run: pip install flake8-github-actions pytest-github-actions-annotate-failures
+    shell: bash
   - name: lint
-    run: flake8 --max-line-length=120 filterweb tests
+    run: flake8 --max-line-length=120 --format github filterweb tests
     shell: bash
   - name: test
-    run: PYTHONPATH=. pytest -xs --ff
+    run: PYTHONPATH=. pytest
     shell: bash
   - name: build
     run: python setup.py bdist_wheel
