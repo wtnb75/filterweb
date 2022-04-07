@@ -23,4 +23,5 @@ runs:
     run: |
       cd publish
       dirindex make --template apache --hide index.html .
+      dirindex make --template apache --hide index.html --recursive dist
     shell: bash
