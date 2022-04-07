@@ -1,0 +1,24 @@
+name: branch
+
+on:
+  push:
+    tags:
+    - 'v*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: versioning
+      run: "echo \"VERSION = '${GITHUB_REF##*/v}'\" > filterweb/_version.py"
+    - uses: ./.github/actions/pytest
+    - name: check
+      run: twine check dist/*.whl
+    - name: deploy to pypi
+      run: twine upload dist/*.whl
+      env:
+        TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
+        TWINE_NON_INTERACTIVE: "1"

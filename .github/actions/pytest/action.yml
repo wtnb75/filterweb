@@ -1,0 +1,28 @@
+runs:
+  using: "composite"
+  steps:
+  - name: apt update
+    run: sudo apt update
+    shell: bash
+  - name: install jo
+    run: sudo apt install -y jo
+    shell: bash
+  - name: setup python 3.10
+    uses: actions/setup-python@v3
+    with:
+      python-version: '3.x'
+  - name: pip install
+    run: pip install -r requirements.txt -r requirements-dev.txt
+    shell: bash
+  - name: install gh-actions modules
+    run: pip install flake8-github-actions pytest-github-actions-annotate-failures
+    shell: bash
+  - name: lint
+    run: flake8 --max-line-length=120 --format github filterweb tests
+    shell: bash
+  - name: test
+    run: PYTHONPATH=. pytest
+    shell: bash
+  - name: build
+    run: python setup.py bdist_wheel
+    shell: bash
