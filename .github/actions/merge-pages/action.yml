@@ -1,11 +1,11 @@
 runs:
   using: "composite"
   steps:
-  - name: list dirs
-    shell: bash
-    run: ls -lR dist cover
   - name: mkdir
     run: mkdir publish
+    shell: bash
+  - name: rm ignore
+    run: rm -f cover/.gitignore
     shell: bash
   - name: copy dist
     run: cp -r dist/ publish/dist/
