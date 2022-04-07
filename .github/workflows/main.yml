@@ -2,10 +2,10 @@ name: main
 
 on:
   push:
-    branches: [main, ci-test]
+    branches: [main]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
