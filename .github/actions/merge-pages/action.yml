@@ -1,6 +1,9 @@
 runs:
   using: "composite"
   steps:
+  - name: list dirs
+    shell: bash
+    run: ls -lR dist cover
   - name: mkdir
     run: mkdir publish
     shell: bash
