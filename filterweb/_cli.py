@@ -27,9 +27,10 @@ def input_test(name, config):
 def filter_test(name, config, arg):
     from .index import open_filter
     conf = yaml.safe_load(config)
-    argdata=yaml.safe_load(arg)
+    argdata = yaml.safe_load(arg)
     ifp = open_filter(name, conf)
     click.echo(ifp.apply(argdata))
+
 
 @cli.command("server")
 @click.argument("name", type=str)
