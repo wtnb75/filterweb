@@ -15,6 +15,7 @@ _log = getLogger(__name__)
 def input_arg(c):
     @dataclass
     class wrap(c):
+        dest: Union[str, int, None] = None
         parse: Optional[str] = None
         select: Optional[str] = None
         __qualname__ = c.__qualname__

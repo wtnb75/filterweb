@@ -32,5 +32,15 @@ def filter_test(name, config, arg):
     click.echo(ifp.apply(argdata))
 
 
+@cli.command("server")
+@click.argument("name", type=str)
+@click.argument("config", type=click.File("r"))
+def server_test(name, config):
+    from .index import open_serve
+    conf = yaml.safe_load(config)
+    ifp = open_serve(name, conf)
+    ifp.serve()
+
+
 if __name__ == "__main__":
     cli()
