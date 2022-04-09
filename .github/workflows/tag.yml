@@ -14,3 +14,7 @@ jobs:
       run: "echo \"VERSION = '${GITHUB_REF##*/v}'\" > filterweb/_version.py"
     - uses: ./.github/actions/pytest
     - uses: ./.github/actions/pypi-upload
+      with:
+        username: ${{ secrets.TWINE_USERNAME }}
+        password: ${{ secrets.TWINE_PASSWORD }}
+        repository_url: ${{ secrets.TWINE_REPOSITORY_URL }}
