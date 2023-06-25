@@ -8,3 +8,5 @@ grpc-requests
 paramiko
 jsonpointer
 pydantic
+requests-unixsocket
+pygments

@@ -30,4 +30,6 @@ class FilterJinja(FilterBase):
             raise ValueError("either template or template_file must be set")
 
     def apply(self, args) -> str:
+        if isinstance(args, list):
+            args = {"data": args}
         return self.tmpl.render(args)
