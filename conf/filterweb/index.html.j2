@@ -1,0 +1,17 @@
+<html>
+<head>
+<title>localhost</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+</head>
+<body>
+<ul>
+{%- for i in data %}
+{%- if "web" in i.entryPoints and i.rule.startswith("Path(") %}
+  <li><a href="{{ i.rule.split('`')[1] }}">{{ i.service }}</a></li>
+{%- endif %}
+{%- if "web" in i.entryPoints and i.rule.startswith("PathPrefix(") %}
+  <li><a href="./{{ i.rule.split('`')[1].strip('/') }}/">{{ i.service }}</a></li>
+{%- endif %}
+{%- endfor %}
+</ul>
+</body></html>

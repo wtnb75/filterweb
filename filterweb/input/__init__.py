@@ -2,6 +2,7 @@
 from .file import *  # noqa
 from .grpc import *  # noqa
 from .http import *  # noqa
+from .http_unix import *  # noqa
 from .input import *  # noqa
 from .jsonrpc import *  # noqa
 from .process import *  # noqa

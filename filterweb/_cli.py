@@ -1,5 +1,6 @@
 import click
 import yaml
+from logging import basicConfig
 
 
 @click.version_option(version="0.1", prog_name="filterweb")
@@ -7,7 +8,7 @@ import yaml
 @click.pass_context
 def cli(ctx):
     if ctx.invoked_subcommand is None:
-        print(ctx.get_help())
+        click.echo(ctx.get_help())
 
 
 @cli.command("input")
@@ -35,7 +36,15 @@ def filter_test(name, config, arg):
 @cli.command("server")
 @click.argument("name", type=str)
 @click.argument("config", type=click.File("r"))
-def server_test(name, config):
+@click.option("--verbose/--quiet")
+def server_test(name, config, verbose):
+    fmt = "%(asctime)s %(levelname)s %(name)s %(message)s"
+    if verbose:
+        basicConfig(level="DEBUG", format=fmt)
+    elif verbose is None:
+        basicConfig(level="INFO", format=fmt)
+    else:
+        basicConfig(level="WARNING", format=fmt)
     from .index import open_serve
     conf = yaml.safe_load(config)
     ifp = open_serve(name, conf)

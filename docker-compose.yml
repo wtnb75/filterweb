@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  top:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--api=true"
+      - "--accesslog=true"
+      - "--accesslog.format=json"
+      - "--accesslog.fields.defaultmode=keep"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    ports:
+      - "8080:80"
+  index:
+    image: wtnb75/filterweb
+    build: ./docker
+    command:
+      - filterweb
+      - server
+      - --verbose
+      - http
+      - /conf/config.yaml
+    volumes:
+      - ./conf/filterweb:/conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.index.loadbalancer.server.port=8080"
+      - "traefik.http.routers.index.rule=Path(`/`)"
+      - "traefik.http.routers.index.entrypoints=web"
+  static:
+    image: nginx:alpine
+    volumes:
+      - ./conf/nginx:/usr/share/nginx/html:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
+      - "traefik.http.routers.nginx.rule=PathPrefix(`/static`)"
+      - "traefik.http.routers.nginx.entrypoints=web"
+      - "traefik.http.middlewares.nginx.stripprefix.prefixes=/static"
+      - "traefik.http.routers.nginx.middlewares=nginx"
