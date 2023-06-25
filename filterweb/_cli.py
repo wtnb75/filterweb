@@ -8,7 +8,7 @@ from logging import basicConfig
 @click.pass_context
 def cli(ctx):
     if ctx.invoked_subcommand is None:
-        print(ctx.get_help())
+        click.echo(ctx.get_help())
 
 
 @cli.command("input")

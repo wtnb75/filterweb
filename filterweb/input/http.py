@@ -9,7 +9,7 @@ from typing import Optional
 class InputHTTPArg:
     url: str
     method: str = "GET"
-    params: Optional[dict]= None
+    params: Optional[dict] = None
 
 
 class InputHTTP(InputBase):
