@@ -5,7 +5,10 @@ try:
 except ImportError:
     pass
 from .http import *  # noqa
-from .http_unix import *  # noqa
+try:
+    from .http_unix import *  # noqa
+except ImportError:
+    pass
 from .input import *  # noqa
 from .jsonrpc import *  # noqa
 from .process import *  # noqa
