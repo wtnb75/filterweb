@@ -47,7 +47,7 @@ class ServeBase(Base, metaclass=ABCMeta):
             i2 = i.copy()
             name = i2.pop("name", "jinja")
             fp = open_filter(name, i2)
-            _log.info("arg=%s", str(res))
+            _log.debug("arg=%s", str(res))
             res = fp.apply(res)
         return res
 
