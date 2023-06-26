@@ -4,9 +4,6 @@ PyYAML
 requests
 jinja2
 xmltodict
-grpc-requests
-paramiko
 jsonpointer
 pydantic
-requests-unixsocket
 pygments

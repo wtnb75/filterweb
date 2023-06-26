@@ -1,6 +1,17 @@
+from typing import Optional
 import click
 import yaml
-from logging import basicConfig
+
+
+def set_verbose(verbose: Optional[bool]):
+    from logging import basicConfig
+    fmt = "%(asctime)s %(levelname)s %(name)s %(message)s"
+    if verbose:
+        basicConfig(level="DEBUG", format=fmt)
+    elif verbose is None:
+        basicConfig(level="INFO", format=fmt)
+    else:
+        basicConfig(level="WARNING", format=fmt)
 
 
 @click.version_option(version="0.1", prog_name="filterweb")
@@ -36,15 +47,9 @@ def filter_test(name, config, arg):
 @cli.command("server")
 @click.argument("name", type=str)
 @click.argument("config", type=click.File("r"))
-@click.option("--verbose/--quiet")
+@click.option("--verbose/--quiet", default=None)
 def server_test(name, config, verbose):
-    fmt = "%(asctime)s %(levelname)s %(name)s %(message)s"
-    if verbose:
-        basicConfig(level="DEBUG", format=fmt)
-    elif verbose is None:
-        basicConfig(level="INFO", format=fmt)
-    else:
-        basicConfig(level="WARNING", format=fmt)
+    set_verbose(verbose)
     from .index import open_serve
     conf = yaml.safe_load(config)
     ifp = open_serve(name, conf)
