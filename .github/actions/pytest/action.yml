@@ -13,12 +13,12 @@ runs:
   - name: install jo
     run: sudo apt install -y jo
     shell: bash
-  - name: setup python 3.10
+  - name: setup python 3.x
     uses: actions/setup-python@v3
     with:
       python-version: '3.x'
   - name: pip install
-    run: pip install -r requirements.txt -r requirements-dev.txt
+    run: pip install .[dev,grpc,ssh,unixsock]
     shell: bash
   - name: install gh-actions modules
     run: pip install flake8-github-actions pytest-github-actions-annotate-failures

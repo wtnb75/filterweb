@@ -17,7 +17,7 @@ services:
     ports:
       - "8080:80"
   index:
-    image: wtnb75/filterweb
+    image: ghcr.io/wtnb75/filterweb
     build: ./docker
     command:
       - filterweb

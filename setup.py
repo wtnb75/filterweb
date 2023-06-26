@@ -1,3 +1,14 @@
+import os
+import glob
 from setuptools import setup
 
-setup(install_requires=open("requirements.txt").readlines())
+extras_require = {
+    os.path.splitext(x)[0].split("-", 1)[-1]: open(x).readlines() for x in glob.glob(
+        os.path.join(os.path.dirname(__file__), "requirements-*.txt"))}
+
+print("ex", extras_require)
+
+setup(
+    install_requires=open("requirements.txt").readlines(),
+    extras_require=extras_require,
+)
