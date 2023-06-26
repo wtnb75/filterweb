@@ -24,6 +24,18 @@ runs:
     uses: docker/build-push-action@v4
     with:
       context: ./docker
+      build-args: |
+        GH_BRANCH=${{ github.ref_name }}
       push: true
       platforms: linux/amd64,linux/arm64
       tags: ${{ inputs.registry }}/${{ github.repository }}:${{ github.ref_name }}
+  - name: build and push(main)
+    if: github.ref_name == "main"
+    uses: docker/build-push-action@v4
+    with:
+      build-args: |
+        GH_BRANCH=${{ github.ref_name }}
+      context: ./docker
+      push: true
+      platforms: linux/amd64,linux/arm64
+      tags: ${{ inputs.registry }}/${{ github.repository }}:latest
