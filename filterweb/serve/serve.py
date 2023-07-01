@@ -12,6 +12,10 @@ class ServeBase(Base, metaclass=ABCMeta):
     def serve(self):
         pass
 
+    @abstractmethod
+    def shutdown(self):
+        pass
+
     def process(self, sources: list[dict], filters: list[dict]):
         from ..index import open_input, open_filter
 

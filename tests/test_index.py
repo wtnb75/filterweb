@@ -3,6 +3,7 @@ import filterweb
 
 
 class TestIndex(unittest.TestCase):
+    @unittest.skipUnless(hasattr(filterweb.input, "InputSSH"), "no paramiko")
     def test_input_ssh(self):
         res = filterweb.open_input(
             "ssh", {"hostname": "example", "command": "echo hello"})
