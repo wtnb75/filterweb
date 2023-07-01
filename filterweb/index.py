@@ -9,6 +9,7 @@ _log = getLogger(__name__)
 def open_cls(mod, base_cls, prefix: str, name: str, config: dict):
     _log.debug("open mod=%s, base=%s, prefix=%s, name=%s",
                str(mod), str(base_cls), prefix, name)
+    available = []
     for k in dir(mod):
         _log.debug("check %s", k)
         if not k.startswith(prefix):
@@ -23,8 +24,10 @@ def open_cls(mod, base_cls, prefix: str, name: str, config: dict):
             _log.debug("subclass %s", k)
             if k.lower() == (prefix + name).lower():
                 return v(config)
+            available.append(k[len(prefix):].lower())
             _log.debug("does not match %s / %s + %s", k, prefix, name)
-    raise ModuleNotFoundError(f"{name} not found")
+    raise ModuleNotFoundError(
+        f"{name} not found. available={'/'.join(available)}")
 
 
 def open_filter(name: str, config: dict) -> fw_filter.FilterBase:

@@ -35,19 +35,33 @@ class ServeFlask(ServeBase):
         return res
 
     def serve(self):
-        app = Flask(__name__)
-        _log.info("open server %s:%s", self.config.host, self.config.port)
+        self.app = Flask(__name__)
+        _log.info("open server %s:%s by %s", self.config.host,
+                  self.config.port, self.config.server)
         for ep in self.config.endpoints:
-            app.route(ep.path, methods=[ep.method])(
-                functools.wraps(self.do1)(functools.partial(self.do1, self, ep)))
+            self.app.add_url_rule(
+                ep.path, endpoint=ep.path,
+                view_func=functools.partial(self.do1, self, ep))
         if self.config.server == "builtin":
-            app.run(self.config.host, self.config.port,
-                    **self.config.other_options)
+            from werkzeug.serving import make_server
+            self.server = make_server(
+                self.config.host, self.config.port, self.app, **self.config.other_options)
+            _log.info("server %s", self.server)
+            self.server.serve_forever()
         elif self.config.server == "waitress":
-            from waitress import serve
-            serve(app, host=self.config.host, port=self.config.port,
-                  **self.config.other_options)
+            from waitress import create_server
+            self.server = create_server(
+                self.app, host=self.config.host, port=self.config.port, **self.config.other_options)
+            self.server.run()
         elif self.config.server == "gunicorn":
             from gunicorn.app import serve
-            serve(app, self.config.other_options,
+            serve(self.app, self.config.other_options,
                   host=self.config.host, port=self.config.port)
+
+    def shutdown(self):
+        if self.config.server == "builtin":
+            self.server.shutdown()
+        elif self.config.server == "waitress":
+            self.server.shutdown()
+        elif self.config.server == "gunicorn":
+            raise NotImplementedError("gunicorn shutdown")

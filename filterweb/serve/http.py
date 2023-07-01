@@ -55,6 +55,9 @@ class ServeHTTP(ServeBase):
         host = self.config.host
         port = self.config.port
         _log.info("open server %s:%s", host, port)
-        server = HTTPServer((host, port), RequestHandler)
-        server.srv = self
-        server.serve_forever()
+        self.server = HTTPServer((host, port), RequestHandler)
+        self.server.srv = self
+        self.server.serve_forever()
+
+    def shutdown(self):
+        self.server.shutdown()
