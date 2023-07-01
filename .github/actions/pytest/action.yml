@@ -18,7 +18,7 @@ runs:
     with:
       python-version: '3.x'
   - name: pip install
-    run: pip install .[dev,grpc,ssh,unixsock]
+    run: pip install .[dev,grpc,ssh,unixsock,flask]
     shell: bash
   - name: install gh-actions modules
     run: pip install flake8-github-actions pytest-github-actions-annotate-failures

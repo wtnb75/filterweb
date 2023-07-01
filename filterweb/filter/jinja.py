@@ -1,6 +1,6 @@
 from .filter import FilterBase
 from jinja2 import Template, Environment, FileSystemLoader
-from typing import Optional
+from typing import Optional, Union
 from dataclasses import field
 from pydantic.dataclasses import dataclass
 
@@ -10,7 +10,9 @@ class FilterJinjaArg:
     template: Optional[str] = None
     template_file: Optional[str] = None
     template_basedir: str = "./"
+    base_key: Optional[str] = None
     params: dict = field(default_factory=dict)
+    vars: Union[list, dict, None] = None
 
 
 class FilterJinja(FilterBase):
@@ -30,6 +32,14 @@ class FilterJinja(FilterBase):
             raise ValueError("either template or template_file must be set")
 
     def apply(self, args) -> str:
-        if isinstance(args, list):
-            args = {"data": args}
+        if self.config.base_key:
+            args = {self.config.base_key: args}
+        if self.config.vars:
+            if isinstance(args, dict) and isinstance(self.config.vars, dict):
+                args.update(self.config.vars)
+            elif isinstance(args, list) and isinstance(self.config.vars, list):
+                args.extend(self.config.vars)
+            else:
+                raise TypeError(
+                    f"type mismatch: args({type(args)}), vars({type(self.config.vars)})")
         return self.tmpl.render(args)

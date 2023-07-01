@@ -52,10 +52,6 @@ class ServeBase(Base, metaclass=ABCMeta):
         return res
 
 
-class ServeFlask(ServeBase):
-    pass
-
-
 class ServeGRPC(ServeBase):
     pass
 

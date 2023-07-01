@@ -18,6 +18,7 @@ def input_arg(c):
         dest: Union[str, int, None] = None
         parse: Optional[str] = None
         select: Optional[str] = None
+        convert_params: Optional[dict] = None
         __qualname__ = c.__qualname__
     return wrap
 
@@ -35,18 +36,19 @@ class InputBase(Base, metaclass=ABCMeta):
     def read(self) -> Union[dict, str]:
         pass
 
-    def convert(self, data: Union[dict, str]) -> dict:
-        if isinstance(data, str):
+    def convert(self, data: Union[dict, str]) -> Union[dict, str]:
+        if isinstance(data, (str, bytes)):
             def_parse = "json"
         else:
             def_parse = "raw"
         parse = getattr(self.config, "parse", def_parse)
+        conv_params = getattr(self.config, "convert_params") or {}
         if parse is None:
             parse = def_parse
         if parse == "json":
-            res = json.loads(data)
+            res = json.loads(data, **conv_params)
         elif parse == "jsonl":
-            decoder = json.JSONDecoder()
+            decoder = json.JSONDecoder(**conv_params)
             res = []
             idx = 0
             while idx != len(data):
@@ -55,10 +57,10 @@ class InputBase(Base, metaclass=ABCMeta):
         elif parse == "yaml":
             res = yaml.safe_load(data)
         elif parse == "csv":
-            rd = csv.DictReader(data.splitlines())
+            rd = csv.DictReader(data.splitlines(), **conv_params)
             res = list(rd)
         elif parse == "xml":
-            res = xmltodict.parse(data)
+            res = xmltodict.parse(data, **conv_params)
         else:
             res = data
         _log.debug("data: %s", res)
@@ -68,5 +70,5 @@ class InputBase(Base, metaclass=ABCMeta):
             _log.debug("selected: %s", res)
         return res
 
-    def process(self) -> dict:
+    def process(self) -> Union[dict, str]:
         return self.convert(self.read())
