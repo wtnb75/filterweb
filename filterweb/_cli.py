@@ -1,3 +1,4 @@
+import functools
 from typing import Optional
 import click
 import yaml
@@ -14,6 +15,22 @@ def set_verbose(verbose: Optional[bool]):
         basicConfig(level="WARNING", format=fmt)
 
 
+def verbose_option(func):
+    @functools.wraps(func)
+    def wrap(verbose, *args, **kwargs):
+        set_verbose(verbose)
+        return func(*args, **kwargs)
+    return click.option("--verbose/--quiet")(wrap)
+
+
+def config_arg(func):
+    @functools.wraps(func)
+    def wrap(config, *args, **kwargs):
+        conf = yaml.safe_load(config)
+        return func(*args, config=conf, **kwargs)
+    return click.argument("config", type=click.File("r"))(wrap)
+
+
 @click.version_option(version="0.1", prog_name="filterweb")
 @click.group(invoke_without_command=True)
 @click.pass_context
@@ -24,35 +41,33 @@ def cli(ctx):
 
 @cli.command("input")
 @click.argument("name", type=str)
-@click.argument("config", type=click.File("r"))
+@config_arg
+@verbose_option
 def input_test(name, config):
     from .index import open_input
-    conf = yaml.safe_load(config)
-    ifp = open_input(name, conf)
+    ifp = open_input(name, config)
     click.echo(ifp.process())
 
 
 @cli.command("filter")
 @click.argument("name", type=str)
-@click.argument("config", type=click.File("r"))
+@config_arg
 @click.argument("arg", type=click.File("r"))
+@verbose_option
 def filter_test(name, config, arg):
     from .index import open_filter
-    conf = yaml.safe_load(config)
     argdata = yaml.safe_load(arg)
-    ifp = open_filter(name, conf)
+    ifp = open_filter(name, config)
     click.echo(ifp.apply(argdata))
 
 
 @cli.command("server")
 @click.argument("name", type=str)
-@click.argument("config", type=click.File("r"))
-@click.option("--verbose/--quiet", default=None)
-def server_test(name, config, verbose):
-    set_verbose(verbose)
+@config_arg
+@verbose_option
+def server_test(name, config):
     from .index import open_serve
-    conf = yaml.safe_load(config)
-    ifp = open_serve(name, conf)
+    ifp = open_serve(name, config)
     ifp.serve()
 
 
