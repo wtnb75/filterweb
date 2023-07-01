@@ -1,4 +1,3 @@
-import json
 import functools
 from logging import getLogger
 from flask import Flask
