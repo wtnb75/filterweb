@@ -2,6 +2,7 @@ import functools
 from typing import Optional
 import click
 import yaml
+from ._version import VERSION
 
 
 def set_verbose(verbose: Optional[bool]):
@@ -31,7 +32,7 @@ def config_arg(func):
     return click.argument("config", type=click.File("r"))(wrap)
 
 
-@click.version_option(version="0.1", prog_name="filterweb")
+@click.version_option(version=VERSION, prog_name="filterweb")
 @click.group(invoke_without_command=True)
 @click.pass_context
 def cli(ctx):

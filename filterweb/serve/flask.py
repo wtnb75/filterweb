@@ -62,6 +62,6 @@ class ServeFlask(ServeBase):
         if self.config.server == "builtin":
             self.server.shutdown()
         elif self.config.server == "waitress":
-            self.server.shutdown()
+            self.server.close()
         elif self.config.server == "gunicorn":
             raise NotImplementedError("gunicorn shutdown")
