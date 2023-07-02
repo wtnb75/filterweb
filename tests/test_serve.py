@@ -1,3 +1,4 @@
+import importlib.util
 import unittest
 import tempfile
 import filterweb
@@ -98,11 +99,8 @@ class TestServeFlask(TestServeHTTP):
         self.url = f"http://{self.srv.server.server_address[0]}:{self.srv.server.server_address[1]}/"
 
 
-try:
-    import waitress as _
-    has_waitress = True
-except ImportError:
-    has_waitress = False
+waitress_spec = importlib.util.find_spec("waitress")
+has_waitress = waitress_spec is not None
 
 
 @unittest.skipUnless(hasattr(filterweb.serve, "ServeFlask") and has_waitress, "no flask/waitress installed")
