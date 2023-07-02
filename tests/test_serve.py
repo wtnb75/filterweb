@@ -1,3 +1,4 @@
+import importlib.util
 import unittest
 import tempfile
 import filterweb
@@ -26,6 +27,13 @@ class TestServeHTTP(unittest.TestCase):
                 "sources": [{
                     "name": "file",
                     "filename": self.tf.name,
+                }, {
+                    "name": "file",
+                    "filename": self.tf.name,
+                }, {
+                    "name": "file",
+                    "filename": self.tf.name,
+                    "merge": False,
                 }],
                 "filters": [{
                     "name": "jinja",
@@ -89,3 +97,21 @@ class TestServeFlask(TestServeHTTP):
         while not hasattr(self.srv, "server"):
             time.sleep(0.5)
         self.url = f"http://{self.srv.server.server_address[0]}:{self.srv.server.server_address[1]}/"
+
+
+waitress_spec = importlib.util.find_spec("waitress")
+has_waitress = waitress_spec is not None
+
+
+@unittest.skipUnless(hasattr(filterweb.serve, "ServeFlask") and has_waitress, "no flask/waitress installed")
+class TestServeFlaskWaitress(TestServeHTTP):
+    def boot(self, config):
+        config["server"] = "waitress"
+        self.srv = filterweb.open_serve("flask", config)
+        self.th = threading.Thread(target=self.srv.serve, name="flask-server")
+        self.th.start()
+        while not hasattr(self.srv, "server"):
+            time.sleep(0.5)
+        self.srv.server.print_listen("Serving on {}:{}")
+        efl = self.srv.server.effective_listen[-1]
+        self.url = f"http://{efl[0]}:{efl[1]}/"

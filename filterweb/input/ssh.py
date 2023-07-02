@@ -3,6 +3,9 @@ from typing import Optional
 import paramiko
 from pydantic.dataclasses import dataclass
 from dataclasses import field
+from logging import getLogger
+
+_log = getLogger(__name__)
 
 
 @input_arg
@@ -39,8 +42,14 @@ class InputSSH(InputBase):
             timeout=self.config.timeout)
         if self.config.input:
             stdin.write(self.config.input)
+        exit_code = stdout.channel.recv_exit_status()
+        if exit_code != 0:
+            _log.info("exit code: %s", exit_code)
         stdin.close()
         res = stdout.read()
         client.close()
+        err_str = stderr.read()
+        if err_str:
+            _log.info("stderr: %s", err_str)
         del stdin, stdout, stderr, client
         return res

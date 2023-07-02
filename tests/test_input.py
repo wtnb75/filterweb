@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, MagicMock
 import os
 import json
 import tempfile
@@ -110,8 +111,9 @@ class TestInput(unittest.TestCase):
 ssh_host = os.getenv("INPUT_SSH_HOST", None)
 
 
-@unittest.skipUnless(ssh_host, "no ssh host")
+@unittest.skipUnless(hasattr(filterweb.input, "InputSSH"), "no paramiko")
 class TestInputSSH(unittest.TestCase):
+    @unittest.skipUnless(ssh_host, "no ssh host")
     def test_ssh(self):
         conf = {
             "hostname": ssh_host,
@@ -122,3 +124,30 @@ class TestInputSSH(unittest.TestCase):
         ifp = filterweb.input.InputSSH(conf)
         res = ifp.process()
         self.assertEqual({"hello": "world"}, res)
+
+    def test_ssh_mock(self):
+        conf = {
+            "hostname": "hello.world",
+            "command": "hello world",
+            "params": json.loads(os.getenv("INPUT_SSH_PARAMS", "{}")),
+            "input": "test",
+            "parse": "json",
+        }
+        with patch("paramiko.SSHClient") as cl:
+            stdin = MagicMock()
+            stdout = MagicMock()
+            stdout.read.return_value = b'{"hello": "world"}\n'
+            stderr = MagicMock()
+            cl.return_value.exec_command.return_value = (stdin, stdout, stderr)
+            ifp = filterweb.input.InputSSH(conf)
+            res = ifp.process()
+            self.assertEqual({"hello": "world"}, res)
+            stdin.write.assert_called_once_with("test")
+            stdin.close.assert_called_once_with()
+            stdout.read.assert_called_once_with()
+            cl.return_value.close.assert_called_once_with()
+            cl.return_value.connect.assert_called_once_with(
+                hostname="hello.world")
+            cl.return_value.set_missing_host_key_policy.assert_called_once()
+            cl.return_value.exec_command.assert_called_once_with(
+                command="hello world", environment=None, get_pty=False, timeout=None)
