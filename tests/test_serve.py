@@ -99,7 +99,7 @@ class TestServeFlask(TestServeHTTP):
 
 
 try:
-    import waitress
+    import waitress as _
     has_waitress = True
 except ImportError:
     has_waitress = False
