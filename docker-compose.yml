@@ -2,7 +2,7 @@ version: '3'
 
 services:
   top:
-    image: traefik:v2.10
+    image: traefik:v3.0.0-beta3
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -12,10 +12,42 @@ services:
       - "--accesslog=true"
       - "--accesslog.format=json"
       - "--accesslog.fields.defaultmode=keep"
+      - "--tracing.openTelemetry=true"
+      - "--tracing.openTelemetry.address=collector:4317"
+      - "--tracing.openTelemetry.grpc=true"
+      - "--tracing.openTelemetry.insecure=true"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     ports:
       - "8080:80"
+  collector:
+    image: otel/opentelemetry-collector
+    command:
+      - "--config=/etc/otel-collector-config.yaml"
+    volumes:
+      - ./conf/otel/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+  jaeger:
+    image: jaegertracing/all-in-one
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
+      COLLECTOR_OTLP_ENABLED: "true"
+    command:
+      - --query.base-path
+      - /jaeger
+      - --memory.max-traces
+      - "10000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
+      - "traefik.http.routers.jaeger.rule=PathPrefix(`/jaeger`)"
+      - "traefik.http.routers.jaeger.entrypoints=web"
+  zipkin:
+    image: openzipkin/zipkin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.zipkin.loadbalancer.server.port=9411"
+      - "traefik.http.routers.zipkin.rule=PathPrefix(`/zipkin`)"
+      - "traefik.http.routers.zipkin.entrypoints=web"
   index:
     image: ghcr.io/wtnb75/filterweb
     build: ./docker
@@ -23,7 +55,8 @@ services:
       - filterweb
       - server
       - --verbose
-      - http
+      - flask
+      #- http
       - /conf/config.yaml
     volumes:
       - ./conf/filterweb:/conf
@@ -32,6 +65,10 @@ services:
       - "traefik.http.services.index.loadbalancer.server.port=8080"
       - "traefik.http.routers.index.rule=Path(`/`)"
       - "traefik.http.routers.index.entrypoints=web"
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
+      OTEL_EXPORTER_OTLP_INSECURE: "true"
+      OTEL_SERVICE_NAME: filterweb
   static:
     image: nginx:alpine
     volumes:

@@ -2,7 +2,7 @@ from .input import InputBase, input_arg
 import os
 import urllib.parse
 import requests_unixsocket
-from pydantic.dataclasses import dataclass
+from dataclasses import dataclass
 
 
 @input_arg

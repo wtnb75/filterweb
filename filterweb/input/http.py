@@ -1,7 +1,16 @@
 from .input import InputBase, input_arg
 import requests
-from pydantic.dataclasses import dataclass
+from dataclasses import dataclass
 from typing import Optional
+from logging import getLogger
+
+_log = getLogger(__name__)
+try:
+    from opentelemetry.instrumentation.requests import RequestsInstrumentor
+    RequestsInstrumentor().instrument()
+    _log.debug("requests instrumentor installed")
+except ImportError:
+    pass
 
 
 @input_arg

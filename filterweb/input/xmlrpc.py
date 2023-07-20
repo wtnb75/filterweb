@@ -1,7 +1,7 @@
 from .input import InputBase, input_arg
 from xmlrpc.client import ServerProxy
-from pydantic.dataclasses import dataclass
-from dataclasses import field
+from dataclasses import field, dataclass
+from ..trace import tracer
 
 
 @input_arg
@@ -17,6 +17,7 @@ class InputXMLRPCArg:
 class InputXMLRPC(InputBase):
     config_cls = InputXMLRPCArg
 
+    @tracer.start_as_current_span(__name__)
     def read(self):
         with ServerProxy(self.config.uri, **self.config.options) as srv:
             mtd = srv

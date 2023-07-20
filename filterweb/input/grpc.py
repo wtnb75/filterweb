@@ -1,7 +1,7 @@
 from .input import InputBase, input_arg
-from dataclasses import field
+from dataclasses import field, dataclass
 from grpc_requests import Client
-from pydantic.dataclasses import dataclass
+from ..trace import tracer
 
 
 @input_arg
@@ -17,6 +17,7 @@ class InputGRPCArg:
 class InputGRPC(InputBase):
     config_cls = InputGRPCArg
 
+    @tracer.start_as_current_span(__name__)
     def read(self) -> dict:
         client = Client.get_by_endpoint(
             self.config.endpoint, **self.config.connect_params)

@@ -1,7 +1,15 @@
 from .input import InputBase, input_arg
 import sqlite3
-from pydantic.dataclasses import dataclass
-from dataclasses import field
+from dataclasses import field, dataclass
+from logging import getLogger
+
+_log = getLogger(__name__)
+try:
+    from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
+    SQLite3Instrumentor().instrument()
+    _log.debug("sqlite3 instrumentor installed")
+except ImportError:
+    pass
 
 
 @input_arg

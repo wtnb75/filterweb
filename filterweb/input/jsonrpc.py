@@ -1,6 +1,7 @@
 from .input import InputBase, input_arg
 import requests
-from pydantic.dataclasses import dataclass
+from dataclasses import dataclass
+from ..trace import tracer
 
 
 @input_arg
@@ -14,6 +15,7 @@ class InputJSONRPCArg:
 class InputJSONRPC(InputBase):
     config_cls = InputJSONRPCArg
 
+    @tracer.start_as_current_span(__name__)
     def read(self) -> dict:
         payload = {
             "method": self.config.method,

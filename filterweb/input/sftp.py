@@ -1,7 +1,7 @@
 from .input import InputBase, input_arg
 import paramiko
-from pydantic.dataclasses import dataclass
-from dataclasses import field
+from dataclasses import field, dataclass
+from ..trace import tracer
 
 
 @input_arg
@@ -22,6 +22,7 @@ class InputSFTP(InputBase):
         "Reject": paramiko.RejectPolicy,
     }
 
+    @tracer.start_as_current_span(__name__)
     def read(self) -> str:
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(self.missing_host_key_map.get(

@@ -3,6 +3,9 @@ from typing import Optional
 import click
 import yaml
 from ._version import VERSION
+from logging import getLogger
+
+_log = getLogger(__name__)
 
 
 def set_verbose(verbose: Optional[bool]):
@@ -67,6 +70,20 @@ def filter_test(name, config, arg):
 @config_arg
 @verbose_option
 def server_test(name, config):
+    try:
+        from opentelemetry import trace
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+        tracer_provider = TracerProvider()
+        tracer_provider.add_span_processor(
+            BatchSpanProcessor(OTLPSpanExporter()))
+        trace.set_tracer_provider(tracer_provider=tracer_provider)
+        _log.info("tracer loaded provider=%s", trace.get_tracer_provider())
+    except ImportError:
+        _log.info("tracer cannot loaded")
+        pass
+
     from .index import open_serve
     ifp = open_serve(name, config)
     ifp.serve()

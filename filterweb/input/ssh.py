@@ -1,9 +1,9 @@
 from .input import InputBase, input_arg
 from typing import Optional
 import paramiko
-from pydantic.dataclasses import dataclass
-from dataclasses import field
+from dataclasses import field, dataclass
 from logging import getLogger
+from ..trace import tracer
 
 _log = getLogger(__name__)
 
@@ -30,6 +30,7 @@ class InputSSH(InputBase):
         "Reject": paramiko.RejectPolicy,
     }
 
+    @tracer.start_as_current_span(__name__)
     def read(self) -> str:
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(self.missing_host_key_map.get(
