@@ -6,17 +6,13 @@ try:
     def get_context(hdr):
         return TraceContextTextMapPropagator().extract(hdr)
 except ImportError:
-    from functools import wraps
+    from contextlib import contextmanager
 
     class tracer:
+        @contextmanager
         @staticmethod
         def start_as_current_span(name="unknown"):
-            def _span(func):
-                @wraps(func)
-                def _deco(*args, **kwargs):
-                    return func(*args, **kwargs)
-                return _deco
-            return _span
+            yield None
 
     def get_context(hdr):
         return None
