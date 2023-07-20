@@ -2,8 +2,8 @@ import json
 from logging import getLogger
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from .serve import ServeBase
-from pydantic.dataclasses import dataclass
-from dataclasses import field
+from dataclasses import field, dataclass
+from ..trace import tracer, get_context, context
 
 _log = getLogger(__name__)
 
@@ -25,23 +25,31 @@ class ServeHTTPArg:
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        ep = self.server.srv.get_endpoint(method="GET", path=self.path)
-        _log.debug("endpoint %s", ep)
-        res = self.server.srv.process(ep.sources, ep.filters)
-        self.send_response(200)
-        self.end_headers()
-        if isinstance(res, str):
-            self.wfile.write(res.encode("utf-8"))
-        elif isinstance(res, (dict, tuple, list)):
-            json.dump(res, self.wfile)
-        else:
-            self.wfile.write(res)
-        return
+        ctx = get_context(self.headers)
+        token = context.attach(ctx)
+        try:
+            with tracer.start_as_current_span("GET"):
+                ep = self.server.srv.get_endpoint(method="GET", path=self.path)
+                _log.debug("endpoint %s", ep)
+                _log.debug("headers: %s", str(dict(self.headers)))
+                res = self.server.srv.process(ep.sources, ep.filters)
+                self.send_response(200)
+                self.end_headers()
+                if isinstance(res, str):
+                    self.wfile.write(res.encode("utf-8"))
+                elif isinstance(res, (dict, tuple, list)):
+                    json.dump(res, self.wfile)
+                else:
+                    self.wfile.write(res)
+                return
+        finally:
+            context.detach(token)
 
 
 class ServeHTTP(ServeBase):
     config_cls = ServeHTTPArg
 
+    @tracer.start_as_current_span("endpoint")
     def get_endpoint(self, method, path) -> Endpoint:
         for ep in self.config.endpoints:
             if ep.method.lower() != method.lower():

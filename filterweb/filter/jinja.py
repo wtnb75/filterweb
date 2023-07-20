@@ -1,8 +1,16 @@
 from .filter import FilterBase
 from jinja2 import Template, Environment, FileSystemLoader
 from typing import Optional, Union
-from dataclasses import field
-from pydantic.dataclasses import dataclass
+from dataclasses import field, dataclass
+from logging import getLogger
+
+_log = getLogger(__name__)
+try:
+    from opentelemetry.instrumentation.jinja2 import Jinja2Instrumentor
+    Jinja2Instrumentor().instrument()
+    _log.debug("jinja2 instrumentor installed")
+except ImportError:
+    pass
 
 
 @dataclass

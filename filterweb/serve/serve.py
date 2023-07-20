@@ -3,6 +3,7 @@ from ..base import Base
 from abc import ABCMeta, abstractmethod
 import jsonpointer
 from logging import getLogger
+from ..trace import tracer
 
 _log = getLogger(__name__)
 
@@ -16,6 +17,7 @@ class ServeBase(Base, metaclass=ABCMeta):
     def shutdown(self):
         pass
 
+    @tracer.start_as_current_span("process")
     def process(self, sources: list[dict], filters: list[dict]):
         from ..index import open_input, open_filter
 

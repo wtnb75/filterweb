@@ -1,5 +1,6 @@
 import unittest
 import filterweb
+import dacite
 
 
 class TestIndex(unittest.TestCase):
@@ -10,7 +11,7 @@ class TestIndex(unittest.TestCase):
         self.assertTrue(isinstance(res, filterweb.input.InputSSH))
 
     def test_input_validate(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(dacite.exceptions.WrongTypeError):
             filterweb.open_input(
                 "http", {"url": {"hello": "world"}})
 

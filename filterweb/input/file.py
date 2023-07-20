@@ -1,5 +1,6 @@
 from .input import InputBase, input_arg
-from pydantic.dataclasses import dataclass
+from dataclasses import dataclass
+from ..trace import tracer
 
 
 @input_arg
@@ -11,6 +12,7 @@ class InputFileArg:
 class InputFile(InputBase):
     config_cls = InputFileArg
 
+    @tracer.start_as_current_span(__name__)
     def read(self) -> str:
         with open(self.config.filename, "r") as fp:
             return fp.read()

@@ -113,5 +113,6 @@ class TestServeFlaskWaitress(TestServeHTTP):
         while not hasattr(self.srv, "server"):
             time.sleep(0.5)
         self.srv.server.print_listen("Serving on {}:{}")
-        efl = self.srv.server.effective_listen[-1]
+        efl = [x for x in self.srv.server.effective_listen if not x[0]
+               [0][0] in "[:"][0]
         self.url = f"http://{efl[0]}:{efl[1]}/"

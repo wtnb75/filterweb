@@ -3,7 +3,8 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.formatters import get_formatter_by_name
 from typing import Optional
-from pydantic.dataclasses import dataclass
+from dataclasses import dataclass
+from ..trace import tracer
 
 
 @dataclass
@@ -23,6 +24,7 @@ class FilterPygments(FilterBase):
             self.lexer = None
         self.formatter = get_formatter_by_name(self.config.formatter)
 
+    @tracer.start_as_current_span(__name__)
     def apply(self, args) -> str:
         if self.lexer:
             lexer = self.lexer

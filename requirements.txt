@@ -4,5 +4,5 @@ requests
 jinja2
 xmltodict
 jsonpointer
-pydantic
+dacite
 pygments

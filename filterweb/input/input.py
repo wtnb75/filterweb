@@ -6,8 +6,10 @@ import json
 import yaml
 import xmltodict
 import jsonpointer
-from pydantic.dataclasses import dataclass
+import re
+from dataclasses import dataclass
 from logging import getLogger
+from ..trace import tracer
 
 _log = getLogger(__name__)
 
@@ -36,6 +38,7 @@ class InputBase(Base, metaclass=ABCMeta):
     def read(self) -> Union[dict, str]:
         pass
 
+    @tracer.start_as_current_span(__name__)
     def convert(self, data: Union[dict, str]) -> Union[dict, str]:
         if isinstance(data, (str, bytes)):
             def_parse = "json"
@@ -56,11 +59,20 @@ class InputBase(Base, metaclass=ABCMeta):
                 res.append(r)
         elif parse == "yaml":
             res = yaml.safe_load(data)
+        elif parse == "yamls":
+            res = yaml.safe_load_all(data)
         elif parse == "csv":
             rd = csv.DictReader(data.splitlines(), **conv_params)
             res = list(rd)
         elif parse == "xml":
             res = xmltodict.parse(data, **conv_params)
+        elif parse == "regex":
+            m = re.compile(conv_params.get("pattern"))
+            res = []
+            for i in data.splitlines():
+                p = m.search(i)
+                if p:
+                    res.append(p.groupdict())
         else:
             res = data
         _log.debug("data: %s", res)
