@@ -10,6 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - uses: ./.github/actions/base
-    - runs: |
+    - run: |
         echo dist/${{ steps.wheel.outputs.filename }}
       shell: bash
