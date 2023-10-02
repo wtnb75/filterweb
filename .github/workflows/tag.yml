@@ -12,7 +12,8 @@ jobs:
     - uses: actions/checkout@master
     - name: versioning
       run: "echo \"VERSION = '${GITHUB_REF##*/v}'\" > filterweb/_version.py"
-    - uses: ./.github/actions/base
+    - id: base
+      uses: ./.github/actions/base
       with:
         gh_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: wtnb75/actions/pypi-upload@main
@@ -20,4 +21,4 @@ jobs:
         username: ${{ secrets.TWINE_USERNAME }}
         password: ${{ secrets.TWINE_PASSWORD }}
         repository_url: ${{ secrets.TWINE_REPOSITORY_URL }}
-        file: dist/${{ steps.wheel.outputs.filename }}
+        file: dist/${{ steps.base.outputs.wheel }}
