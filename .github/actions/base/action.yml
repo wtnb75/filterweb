@@ -1,0 +1,27 @@
+runs:
+  using: "composite"
+  steps:
+    - name: apt update
+      run: sudo apt update
+      shell: bash
+    - name: install ${{ inputs.packages }}
+      run: sudo apt install -y ${{ inputs.packages }}
+      shell: bash
+    - uses: wtnb75/actions/python@main
+      with:
+        pipinstall: ".[dev,grpc,ssh,unixsock,flask]"
+    - uses: wtnb75/actions/pytest@main
+    - id: wheel
+      uses: wtnb75/actions/wheel@main
+    - uses: wtnb75/actions/merge-pages@main
+      with:
+        dirs: "cover"
+        pydist: dist
+    - uses: wtnb75/actions/docker@main
+      with:
+        password: ${{ secrets.GITHUB_TOKEN }}
+        context: ./docker
+        build-args: |
+          GH_BRANCH=${{ github.ref_name }}
+        push: true
+        image-version: ${{ github.ref_name }}

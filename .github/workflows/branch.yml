@@ -9,8 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - uses: ./.github/actions/pytest
-    - uses: ./.github/actions/merge-pages
-    - uses: ./.github/actions/docker
-      with:
-        password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: ./.github/actions/base
+    - runs: |
+        echo dist/${{ steps.wheel.outputs.filename }}
+      shell: bash
