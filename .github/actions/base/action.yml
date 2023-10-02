@@ -1,0 +1,39 @@
+inputs:
+  gh_token:
+    required: true
+    description: "github token"
+outputs:
+  wheel:
+    description: ".whl filename"
+    value: ${{ steps.wheel.outputs.filename }}
+  docker:
+    description: "docker image name"
+    value: ${{ steps.docker.outputs.image-name }}
+runs:
+  using: "composite"
+  steps:
+    - name: apt update
+      run: sudo apt update
+      shell: bash
+    - name: install jo
+      run: sudo apt install -y jo
+      shell: bash
+    - uses: wtnb75/actions/python@main
+      with:
+        pipinstall: ".[dev,grpc,ssh,unixsock,flask]"
+    - uses: wtnb75/actions/pytest@main
+    - id: wheel
+      uses: wtnb75/actions/wheel@main
+    - uses: wtnb75/actions/merge-pages@main
+      with:
+        dirs: "cover"
+        pydist: dist
+    - id: docker
+      uses: wtnb75/actions/docker@main
+      with:
+        password: ${{ inputs.gh_token }}
+        context: ./docker
+        build-args: |
+          GH_BRANCH=${{ github.ref_name }}
+        push: true
+        image-version: ${{ github.ref_name }}
