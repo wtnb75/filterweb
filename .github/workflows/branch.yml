@@ -10,6 +10,8 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - uses: ./.github/actions/base
+      with:
+        gh_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
         echo dist/${{ steps.wheel.outputs.filename }}
       shell: bash

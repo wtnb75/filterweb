@@ -13,6 +13,8 @@ jobs:
     - name: versioning
       run: "echo \"VERSION = '${GITHUB_REF##*/v}'\" > filterweb/_version.py"
     - uses: ./.github/actions/base
+      with:
+        gh_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: wtnb75/actions/pypi-upload@main
       with:
         username: ${{ secrets.TWINE_USERNAME }}

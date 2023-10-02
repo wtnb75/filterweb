@@ -1,11 +1,15 @@
+inputs:
+  gh_token:
+    required: true
+    description: "github token"
 runs:
   using: "composite"
   steps:
     - name: apt update
       run: sudo apt update
       shell: bash
-    - name: install ${{ inputs.packages }}
-      run: sudo apt install -y ${{ inputs.packages }}
+    - name: install jo
+      run: sudo apt install -y jo
       shell: bash
     - uses: wtnb75/actions/python@main
       with:
@@ -19,7 +23,7 @@ runs:
         pydist: dist
     - uses: wtnb75/actions/docker@main
       with:
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ inputs.gh_token }}
         context: ./docker
         build-args: |
           GH_BRANCH=${{ github.ref_name }}
