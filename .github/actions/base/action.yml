@@ -2,6 +2,9 @@ inputs:
   gh_token:
     required: true
     description: "github token"
+outputs:
+  wheel: ${{ steps.wheel.outputs.filename }}
+  docker: ${{ steps.docker.outputs.image-name }}
 runs:
   using: "composite"
   steps:

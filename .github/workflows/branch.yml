@@ -9,9 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - uses: ./.github/actions/base
+    - id: base
+      uses: ./.github/actions/base
       with:
         gh_token: ${{ secrets.GITHUB_TOKEN }}
     - run: |
-        echo dist/${{ steps.wheel.outputs.filename }}
+        echo wheel dist/${{ steps.base.outputs.wheel }}
+        echo docker dist/${{ steps.base.outputs.docker }}
       shell: bash
