@@ -20,7 +20,8 @@ runs:
       shell: bash
     - uses: wtnb75/actions/python@main
       with:
-        pipinstall: ".[dev,grpc,ssh,unixsock,flask]"
+        #pipinstall: ".[dev,grpc,ssh,unixsock,flask]"
+        pipinstall: ".[dev,ssh,unixsock,flask]"
     - uses: wtnb75/actions/pytest@main
     - id: wheel
       uses: wtnb75/actions/wheel@main
