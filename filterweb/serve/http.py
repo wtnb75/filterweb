@@ -1,4 +1,5 @@
 import json
+import io
 from logging import getLogger
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from .serve import ServeBase
@@ -29,18 +30,28 @@ class RequestHandler(BaseHTTPRequestHandler):
         token = context.attach(ctx)
         try:
             with tracer.start_as_current_span("GET"):
+                out = io.StringIO()
                 ep = self.server.srv.get_endpoint(method="GET", path=self.path)
                 _log.debug("endpoint %s", ep)
                 _log.debug("headers: %s", str(dict(self.headers)))
                 res = self.server.srv.process(ep.sources, ep.filters)
                 self.send_response(200)
-                self.end_headers()
-                if isinstance(res, str):
-                    self.wfile.write(res.encode("utf-8"))
-                elif isinstance(res, (dict, tuple, list)):
-                    json.dump(res, self.wfile)
+                if isinstance(res, (dict, tuple, list)):
+                    self.send_header("content-type", "application/json")
+                    json.dump(res, out, ensure_ascii=False)
                 else:
-                    self.wfile.write(res)
+                    out.write(res)
+                    head100 = out.getvalue()[:100]
+                    if "?xml" in head100:
+                        self.send_header("content-type", "application/xml; charset=utf-8")
+                    elif "DOCTYPE" in head100 or "<html" in head100:
+                        self.send_header("content-type", "text/html; charset=utf-8")
+                    else:
+                        self.send_header("content-type", "text/plain; charset=utf-8")
+                outb = out.getvalue().encode("utf-8")
+                self.send_header("content-length", str(len(outb)))
+                self.end_headers()
+                self.wfile.write(out.getvalue().encode("utf-8"))
                 return
         finally:
             context.detach(token)
