@@ -7,6 +7,7 @@ from logging import getLogger
 _log = getLogger(__name__)
 try:
     from opentelemetry.instrumentation.requests import RequestsInstrumentor
+
     RequestsInstrumentor().instrument()
     _log.debug("requests instrumentor installed")
 except ImportError:
@@ -29,7 +30,5 @@ class InputHTTP(InputBase):
             args = {}
         else:
             args = self.config.params
-        res = requests.request(
-            method=self.config.method,
-            url=self.config.url, **args)
+        res = requests.request(method=self.config.method, url=self.config.url, **args)
         return res.text

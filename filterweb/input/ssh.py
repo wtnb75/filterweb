@@ -33,14 +33,16 @@ class InputSSH(InputBase):
     @tracer.start_as_current_span(__name__)
     def read(self) -> str:
         client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(self.missing_host_key_map.get(
-            self.config.missing_host_key, paramiko.WarningPolicy)())
+        client.set_missing_host_key_policy(
+            self.missing_host_key_map.get(self.config.missing_host_key, paramiko.WarningPolicy)()
+        )
         client.connect(hostname=self.config.hostname, **self.config.params)
         stdin, stdout, stderr = client.exec_command(
             command=self.config.command,
             environment=self.config.env,
             get_pty=self.config.get_pty,
-            timeout=self.config.timeout)
+            timeout=self.config.timeout,
+        )
         if self.config.input:
             stdin.write(self.config.input)
         exit_code = stdout.channel.recv_exit_status()

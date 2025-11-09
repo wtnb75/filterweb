@@ -25,8 +25,9 @@ class InputSFTP(InputBase):
     @tracer.start_as_current_span(__name__)
     def read(self) -> str:
         client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(self.missing_host_key_map.get(
-            self.config.missing_host_key, paramiko.WarningPolicy)())
+        client.set_missing_host_key_policy(
+            self.missing_host_key_map.get(self.config.missing_host_key, paramiko.WarningPolicy)()
+        )
         client.connect(hostname=self.config.hostname, **self.config.params)
         sftp = client.open_sftp()
         fp = sftp.file(filename=self.config.filename)

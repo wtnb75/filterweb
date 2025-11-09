@@ -7,6 +7,7 @@ from logging import getLogger
 _log = getLogger(__name__)
 try:
     from opentelemetry.instrumentation.jinja2 import Jinja2Instrumentor
+
     Jinja2Instrumentor().instrument()
     _log.debug("jinja2 instrumentor installed")
 except ImportError:
@@ -30,11 +31,9 @@ class FilterJinja(FilterBase):
     def __init__(self, config):
         super().__init__(config)
         if self.config.template:
-            self.tmpl = Template(
-                source=self.config.template, **self.config.params)
+            self.tmpl = Template(source=self.config.template, **self.config.params)
         elif self.config.template_file:
-            env = Environment(loader=FileSystemLoader(
-                self.config.template_basedir, encoding="utf-8"))
+            env = Environment(loader=FileSystemLoader(self.config.template_basedir, encoding="utf-8"))
             self.tmpl = env.get_template(self.config.template_file)
         else:
             raise ValueError("either template or template_file must be set")
@@ -48,6 +47,5 @@ class FilterJinja(FilterBase):
             elif isinstance(args, list) and isinstance(self.config.vars, list):
                 args.extend(self.config.vars)
             else:
-                raise TypeError(
-                    f"type mismatch: args({type(args)}), vars({type(self.config.vars)})")
+                raise TypeError(f"type mismatch: args({type(args)}), vars({type(self.config.vars)})")
         return self.tmpl.render(args)

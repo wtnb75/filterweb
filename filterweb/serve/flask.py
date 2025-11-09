@@ -4,10 +4,12 @@ from flask import Flask, request
 from .serve import ServeBase
 from dataclasses import field, dataclass
 from ..trace import get_context, context
+
 _log = getLogger(__name__)
 
 try:
     from opentelemetry.instrumentation.flask import FlaskInstrumentor
+
     FlaskInstrumentor().instrument(enable_commenter=True, commenter_options={})
     _log.debug("flask instrumentor installed")
 except ImportError:
@@ -48,28 +50,50 @@ class ServeFlask(ServeBase):
 
     def serve(self):
         self.app = Flask(__name__)
-        _log.info("open server %s:%s by %s", self.config.host,
-                  self.config.port, self.config.server)
+        _log.info(
+            "open server %s:%s by %s",
+            self.config.host,
+            self.config.port,
+            self.config.server,
+        )
         for ep in self.config.endpoints:
             self.app.add_url_rule(
-                ep.path, endpoint=ep.path, methods=[ep.method],
-                view_func=functools.partial(self.do1, self, ep))
+                ep.path,
+                endpoint=ep.path,
+                methods=[ep.method],
+                view_func=functools.partial(self.do1, self, ep),
+            )
         if self.config.server == "builtin":
             from werkzeug.serving import make_server
+
             self.server = make_server(
-                self.config.host, self.config.port, self.app, **self.config.other_options)
+                self.config.host,
+                self.config.port,
+                self.app,
+                **self.config.other_options,
+            )
             _log.info("server %s", self.server)
             self.server.serve_forever()
         elif self.config.server == "waitress":
             from waitress import create_server
+
             self.server = create_server(
-                self.app, host=self.config.host, port=self.config.port, **self.config.other_options)
+                self.app,
+                host=self.config.host,
+                port=self.config.port,
+                **self.config.other_options,
+            )
             _log.info("server %s", self.server)
             self.server.run()
         elif self.config.server == "gunicorn":
             from gunicorn.app import serve
-            serve(self.app, self.config.other_options,
-                  host=self.config.host, port=self.config.port)
+
+            serve(
+                self.app,
+                self.config.other_options,
+                host=self.config.host,
+                port=self.config.port,
+            )
         else:
             raise NotImplementedError(f"server {self.config.server} not found")
 

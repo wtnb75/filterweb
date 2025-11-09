@@ -22,6 +22,7 @@ def input_arg(c):
         select: Optional[str] = None
         convert_params: Optional[dict] = None
         __qualname__ = c.__qualname__
+
     return wrap
 
 

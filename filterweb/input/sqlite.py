@@ -6,6 +6,7 @@ from logging import getLogger
 _log = getLogger(__name__)
 try:
     from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
+
     SQLite3Instrumentor().instrument()
     _log.debug("sqlite3 instrumentor installed")
 except ImportError:
@@ -29,10 +30,12 @@ class InputSQLite3(InputBase):
         super().__init__(config)
         if self.config.read_only:
             self.db = sqlite3.connect(
-                f"file:{self.config.database}?mode=ro", uri=True, **self.config.connect_params)
+                f"file:{self.config.database}?mode=ro",
+                uri=True,
+                **self.config.connect_params,
+            )
         else:
-            self.db = sqlite3.connect(
-                self.config.database, **self.config.connect_params)
+            self.db = sqlite3.connect(self.config.database, **self.config.connect_params)
 
     def read(self) -> list[dict]:
         cur = self.db.execute(self.config.query, self.config.params)

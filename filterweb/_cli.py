@@ -10,6 +10,7 @@ _log = getLogger(__name__)
 
 def set_verbose(verbose: Optional[bool]):
     from logging import basicConfig
+
     fmt = "%(asctime)s %(levelname)s %(name)s %(message)s"
     if verbose:
         basicConfig(level="DEBUG", format=fmt)
@@ -24,6 +25,7 @@ def verbose_option(func):
     def wrap(verbose, *args, **kwargs):
         set_verbose(verbose)
         return func(*args, **kwargs)
+
     return click.option("--verbose/--quiet")(wrap)
 
 
@@ -32,6 +34,7 @@ def config_arg(func):
     def wrap(config, *args, **kwargs):
         conf = yaml.safe_load(config)
         return func(*args, config=conf, **kwargs)
+
     return click.argument("config", type=click.File("r"))(wrap)
 
 
@@ -49,6 +52,7 @@ def cli(ctx):
 @verbose_option
 def input_test(name, config):
     from .index import open_input
+
     ifp = open_input(name, config)
     click.echo(ifp.process())
 
@@ -60,6 +64,7 @@ def input_test(name, config):
 @verbose_option
 def filter_test(name, config, arg):
     from .index import open_filter
+
     argdata = yaml.safe_load(arg)
     ifp = open_filter(name, config)
     click.echo(ifp.apply(argdata))
@@ -74,10 +79,12 @@ def server_test(name, config):
         from opentelemetry import trace
         from opentelemetry.sdk.trace import TracerProvider
         from opentelemetry.sdk.trace.export import BatchSpanProcessor
-        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
+            OTLPSpanExporter,
+        )
+
         tracer_provider = TracerProvider()
-        tracer_provider.add_span_processor(
-            BatchSpanProcessor(OTLPSpanExporter()))
+        tracer_provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
         trace.set_tracer_provider(tracer_provider=tracer_provider)
         _log.info("tracer loaded provider=%s", trace.get_tracer_provider())
     except ImportError:
@@ -85,6 +92,7 @@ def server_test(name, config):
         pass
 
     from .index import open_serve
+
     ifp = open_serve(name, config)
     ifp.serve()
 
