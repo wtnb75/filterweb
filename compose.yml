@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   top:
     image: traefik:v3.0.0-beta3
@@ -19,7 +17,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     ports:
-      - "8080:80"
+      - "8081:80"
   collector:
     image: otel/opentelemetry-collector
     command:
@@ -48,15 +46,35 @@ services:
       - "traefik.http.services.zipkin.loadbalancer.server.port=9411"
       - "traefik.http.routers.zipkin.rule=PathPrefix(`/zipkin`)"
       - "traefik.http.routers.zipkin.entrypoints=web"
+  index-dev:
+    image: ghcr.io/wtnb75/filterweb
+    command:
+      - python
+      - -m
+      - filterweb._cli
+      - server
+      - http
+      - /conf/config.yaml
+    volumes:
+      - ./conf/filterweb:/conf
+      - ./:/app
+    working_dir: /app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.indexdev.loadbalancer.server.port=8080"
+      - "traefik.http.routers.indexdev.rule=Path(`/dev`)"
+      - "traefik.http.routers.indexdev.entrypoints=web"
+      - "traefik.http.middlewares.indexdev.stripprefix.prefixes=/dev"
+      - "traefik.http.routers.indexdev.middlewares=indexdev"
   index:
     image: ghcr.io/wtnb75/filterweb
     build: ./docker
     command:
       - filterweb
       - server
-      - --verbose
-      - flask
-      #- http
+      #- --verbose
+      #- flask
+      - http
       - /conf/config.yaml
     volumes:
       - ./conf/filterweb:/conf
