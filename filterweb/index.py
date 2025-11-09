@@ -7,8 +7,13 @@ _log = getLogger(__name__)
 
 
 def open_cls(mod, base_cls, prefix: str, name: str, config: dict):
-    _log.debug("open mod=%s, base=%s, prefix=%s, name=%s",
-               str(mod), str(base_cls), prefix, name)
+    _log.debug(
+        "open mod=%s, base=%s, prefix=%s, name=%s",
+        str(mod),
+        str(base_cls),
+        prefix,
+        name,
+    )
     available = []
     for k in dir(mod):
         _log.debug("check %s", k)
@@ -24,25 +29,36 @@ def open_cls(mod, base_cls, prefix: str, name: str, config: dict):
             _log.debug("subclass %s", k)
             if k.lower() == (prefix + name).lower():
                 return v(config)
-            available.append(k[len(prefix):].lower())
+            available.append(k[len(prefix) :].lower())
             _log.debug("does not match %s / %s + %s", k, prefix, name)
-    raise ModuleNotFoundError(
-        f"{name} not found. available={'/'.join(available)}")
+    raise ModuleNotFoundError(f"{name} not found. available={'/'.join(available)}")
 
 
 def open_filter(name: str, config: dict) -> fw_filter.FilterBase:
     return open_cls(
-        mod=fw_filter, base_cls=fw_filter.FilterBase, prefix="Filter",
-        name=name, config=config)
+        mod=fw_filter,
+        base_cls=fw_filter.FilterBase,
+        prefix="Filter",
+        name=name,
+        config=config,
+    )
 
 
 def open_input(name: str, config: dict) -> fw_input.InputBase:
     return open_cls(
-        mod=fw_input, base_cls=fw_input.InputBase, prefix="Input",
-        name=name, config=config)
+        mod=fw_input,
+        base_cls=fw_input.InputBase,
+        prefix="Input",
+        name=name,
+        config=config,
+    )
 
 
 def open_serve(name: str, config: dict) -> fw_serve.ServeBase:
     return open_cls(
-        mod=fw_serve, base_cls=fw_serve.ServeBase, prefix="Serve",
-        name=name, config=config)
+        mod=fw_serve,
+        base_cls=fw_serve.ServeBase,
+        prefix="Serve",
+        name=name,
+        config=config,
+    )

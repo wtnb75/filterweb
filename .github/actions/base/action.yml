@@ -22,6 +22,7 @@ runs:
       with:
         #pipinstall: ".[dev,grpc,ssh,unixsock,flask]"
         pipinstall: ".[dev,ssh,unixsock,flask]"
+    - uses: wtnb75/actions/ruff@main
     - uses: wtnb75/actions/pytest@main
     - id: wheel
       uses: wtnb75/actions/wheel@main

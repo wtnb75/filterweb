@@ -1,6 +1,9 @@
 try:
     from opentelemetry import trace, context
-    from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+    from opentelemetry.trace.propagation.tracecontext import (
+        TraceContextTextMapPropagator,
+    )
+
     tracer = trace.get_tracer(__name__)
 
     def get_context(hdr):
@@ -25,5 +28,6 @@ except ImportError:
         @staticmethod
         def detach(token):
             pass
+
 
 __all__ = ["tracer"]

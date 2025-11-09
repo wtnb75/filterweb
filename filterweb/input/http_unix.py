@@ -18,9 +18,6 @@ class InputHTTPUnix(InputBase):
 
     def read(self) -> str:
         sess = requests_unixsocket.Session()
-        url = os.path.join(
-            'http+unix://' + urllib.parse.quote(self.config.sockpath), self.config.path)
-        res = sess.request(
-            method=self.config.method,
-            url=url)
+        url = os.path.join("http+unix://" + urllib.parse.quote(self.config.sockpath), self.config.path)
+        res = sess.request(method=self.config.method, url=url)
         return res.text

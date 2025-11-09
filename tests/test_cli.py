@@ -50,6 +50,5 @@ class TestCLI(unittest.TestCase):
                 }
                 yaml.dump(conf, tf2)
                 tf2.flush()
-                res = CliRunner().invoke(
-                    cli, ["filter", "jinja", tf2.name, tf1.name])
+                res = CliRunner().invoke(cli, ["filter", "jinja", tf2.name, tf1.name])
                 self.assertEqual("hello world", res.output.strip())

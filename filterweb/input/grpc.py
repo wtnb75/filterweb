@@ -19,8 +19,5 @@ class InputGRPC(InputBase):
 
     @tracer.start_as_current_span(__name__)
     def read(self) -> dict:
-        client = Client.get_by_endpoint(
-            self.config.endpoint, **self.config.connect_params)
-        return client.request(
-            self.config.service_name,
-            self.config.method, self.config.arg)
+        client = Client.get_by_endpoint(self.config.endpoint, **self.config.connect_params)
+        return client.request(self.config.service_name, self.config.method, self.config.arg)

@@ -18,19 +18,23 @@ class TestInput(unittest.TestCase):
         with tempfile.NamedTemporaryFile("r+") as tf:
             json.dump({"hello": ["world", "earth"]}, fp=tf)
             tf.flush()
-            ifp = filterweb.input.InputFile({
-                "filename": tf.name,
-                "parse": "json",
-                "select": "/hello/1",
-            })
+            ifp = filterweb.input.InputFile(
+                {
+                    "filename": tf.name,
+                    "parse": "json",
+                    "select": "/hello/1",
+                }
+            )
             res = ifp.process()
             self.assertEqual("earth", res)
 
     def test_process(self):
-        ifp = filterweb.input.InputProcess({
-            "command": ["jo", "hello=world"],
-            "parse": "json",
-        })
+        ifp = filterweb.input.InputProcess(
+            {
+                "command": ["jo", "hello=world"],
+                "parse": "json",
+            }
+        )
         res = ifp.process()
         self.assertEqual({"hello": "world"}, res)
 
@@ -39,27 +43,35 @@ class TestInput(unittest.TestCase):
             json.dump({"hello": ["world", "earth"]}, fp=tf)
             json.dump({"hello": ["xyz"]}, fp=tf)
             tf.flush()
-            ifp = filterweb.input.InputFile({
-                "filename": tf.name,
-                "parse": "jsonl",
-                "select": "/1/hello/0",
-            })
+            ifp = filterweb.input.InputFile(
+                {
+                    "filename": tf.name,
+                    "parse": "jsonl",
+                    "select": "/1/hello/0",
+                }
+            )
             res = ifp.process()
             self.assertEqual("xyz", res)
 
     def test_csv(self):
         with tempfile.NamedTemporaryFile("r+") as tf:
-            tf.write("\n".join([
-                "title,value",
-                "hello,1",
-                "world,2",
-            ]))
+            tf.write(
+                "\n".join(
+                    [
+                        "title,value",
+                        "hello,1",
+                        "world,2",
+                    ]
+                )
+            )
             tf.flush()
-            ifp = filterweb.input.InputFile({
-                "filename": tf.name,
-                "parse": "csv",
-                "select": "/1/title",
-            })
+            ifp = filterweb.input.InputFile(
+                {
+                    "filename": tf.name,
+                    "parse": "csv",
+                    "select": "/1/title",
+                }
+            )
             res = ifp.process()
             self.assertEqual("world", res)
 
@@ -67,11 +79,13 @@ class TestInput(unittest.TestCase):
         with tempfile.NamedTemporaryFile("r+") as tf:
             tf.write("""<x><a hello="world">text1</a></x>""")
             tf.flush()
-            ifp = filterweb.input.InputFile({
-                "filename": tf.name,
-                "parse": "xml",
-                "select": "/x/a",
-            })
+            ifp = filterweb.input.InputFile(
+                {
+                    "filename": tf.name,
+                    "parse": "xml",
+                    "select": "/x/a",
+                }
+            )
             res = ifp.process()
 
             self.assertEqual({"@hello": "world", "#text": "text1"}, res)
@@ -85,8 +99,11 @@ class TestInput(unittest.TestCase):
             cur.executemany(ins, [(1, "hello"), (2, "world")])
             db.commit()
             db.close()
-            conf = {"database": tf.name,
-                    "query": "select * from tbl1", "select": "/1/val"}
+            conf = {
+                "database": tf.name,
+                "query": "select * from tbl1",
+                "select": "/1/val",
+            }
             ifp = filterweb.input.InputSQLite3(conf)
             res = ifp.process()
             self.assertEqual("world", res)
@@ -100,8 +117,10 @@ class TestInput(unittest.TestCase):
             cur.executemany(ins, [(1, "hello"), (2, "world")])
             db.commit()
             db.close()
-            conf = {"database": tf.name,
-                    "query": "update tbl1 set val='abc' where id==1"}
+            conf = {
+                "database": tf.name,
+                "query": "update tbl1 set val='abc' where id==1",
+            }
             with self.assertRaises(sqlite3.OperationalError) as e:
                 ifp = filterweb.input.InputSQLite3(conf)
                 ifp.process()
@@ -146,8 +165,8 @@ class TestInputSSH(unittest.TestCase):
             stdin.close.assert_called_once_with()
             stdout.read.assert_called_once_with()
             cl.return_value.close.assert_called_once_with()
-            cl.return_value.connect.assert_called_once_with(
-                hostname="hello.world")
+            cl.return_value.connect.assert_called_once_with(hostname="hello.world")
             cl.return_value.set_missing_host_key_policy.assert_called_once()
             cl.return_value.exec_command.assert_called_once_with(
-                command="hello world", environment=None, get_pty=False, timeout=None)
+                command="hello world", environment=None, get_pty=False, timeout=None
+            )

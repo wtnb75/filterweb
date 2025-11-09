@@ -22,50 +22,68 @@ class TestServeHTTP(unittest.TestCase):
         json.dump({"hello": "world"}, self.tf)
         self.tf.flush()
         config = {
-            "endpoints": [{
-                "path": "/",
-                "sources": [{
-                    "name": "file",
-                    "filename": self.tf.name,
-                }, {
-                    "name": "file",
-                    "filename": self.tf.name,
-                }, {
-                    "name": "file",
-                    "filename": self.tf.name,
-                    "merge": False,
-                }],
-                "filters": [{
-                    "name": "jinja",
-                    "template": "hello, {{hello}} from {{from}}",
-                    "vars": {
-                        "from": "you",
-                    }
-                }],
-            }, {
-                "path": "/source",
-                "sources": [{
-                    "name": "file",
-                    "filename": self.tf.name,
-                    "parse": "raw",
-                }],
-                "filters": [{
-                    "name": "pygments",
-                    "formatter": "html",
-                    "lexer": "json",
-                }],
-            }, {
-                "path": "/source/nolex",
-                "sources": [{
-                    "name": "file",
-                    "filename": self.tf.name,
-                    "parse": "raw",
-                }],
-                "filters": [{
-                    "name": "pygments",
-                    "formatter": "html",
-                }],
-            }]
+            "endpoints": [
+                {
+                    "path": "/",
+                    "sources": [
+                        {
+                            "name": "file",
+                            "filename": self.tf.name,
+                        },
+                        {
+                            "name": "file",
+                            "filename": self.tf.name,
+                        },
+                        {
+                            "name": "file",
+                            "filename": self.tf.name,
+                            "merge": False,
+                        },
+                    ],
+                    "filters": [
+                        {
+                            "name": "jinja",
+                            "template": "hello, {{hello}} from {{from}}",
+                            "vars": {
+                                "from": "you",
+                            },
+                        }
+                    ],
+                },
+                {
+                    "path": "/source",
+                    "sources": [
+                        {
+                            "name": "file",
+                            "filename": self.tf.name,
+                            "parse": "raw",
+                        }
+                    ],
+                    "filters": [
+                        {
+                            "name": "pygments",
+                            "formatter": "html",
+                            "lexer": "json",
+                        }
+                    ],
+                },
+                {
+                    "path": "/source/nolex",
+                    "sources": [
+                        {
+                            "name": "file",
+                            "filename": self.tf.name,
+                            "parse": "raw",
+                        }
+                    ],
+                    "filters": [
+                        {
+                            "name": "pygments",
+                            "formatter": "html",
+                        }
+                    ],
+                },
+            ]
         }
         self.boot(config)
 
@@ -80,11 +98,11 @@ class TestServeHTTP(unittest.TestCase):
         self.assertEqual("hello, world from you", res.text)
 
     def test_file2source(self):
-        res = requests.get(self.url+"source")
+        res = requests.get(self.url + "source")
         self.assertIn("&quot;hello&quot;", res.text)
 
     def test_file2source_nolex(self):
-        res = requests.get(self.url+"source/nolex")
+        res = requests.get(self.url + "source/nolex")
         self.assertIn("{&quot;hello&quot;: &quot;world&quot;}", res.text)
 
 
@@ -103,7 +121,10 @@ waitress_spec = importlib.util.find_spec("waitress")
 has_waitress = waitress_spec is not None
 
 
-@unittest.skipUnless(hasattr(filterweb.serve, "ServeFlask") and has_waitress, "no flask/waitress installed")
+@unittest.skipUnless(
+    hasattr(filterweb.serve, "ServeFlask") and has_waitress,
+    "no flask/waitress installed",
+)
 class TestServeFlaskWaitress(TestServeHTTP):
     def boot(self, config):
         config["server"] = "waitress"
@@ -113,6 +134,5 @@ class TestServeFlaskWaitress(TestServeHTTP):
         while not hasattr(self.srv, "server"):
             time.sleep(0.5)
         self.srv.server.print_listen("Serving on {}:{}")
-        efl = [x for x in self.srv.server.effective_listen if not x[0]
-               [0][0] in "[:"][0]
+        efl = [x for x in self.srv.server.effective_listen if x[0][0][0] not in "[:"][0]
         self.url = f"http://{efl[0]}:{efl[1]}/"

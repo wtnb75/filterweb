@@ -20,8 +20,11 @@ class FilterProcess(FilterBase):
     def apply(self, args) -> str:
         p = subprocess.Popen(
             args=self.config.command,
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            **self.config.params)
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            **self.config.params,
+        )
         stdout, stderr = p.communicate(args)
         if p.returncode:
             _log.info("exit code: %s", p.returncode)

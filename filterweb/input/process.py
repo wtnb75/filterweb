@@ -17,5 +17,4 @@ class InputProcess(InputBase):
 
     @tracer.start_as_current_span(__name__)
     def read(self) -> str:
-        return subprocess.check_output(
-            self.config.command, input=self.config.input, **self.config.params)
+        return subprocess.check_output(self.config.command, input=self.config.input, **self.config.params)
