@@ -9,14 +9,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: versioning
       run: "echo \"VERSION = '${GITHUB_REF##*/v}'\" > filterweb/_version.py"
     - id: base
       uses: ./.github/actions/base
       with:
         gh_token: ${{ secrets.GITHUB_TOKEN }}
-    - uses: wtnb75/actions/pypi-upload@main
+    - uses: wtnb75/actions/pypi-upload@c1711251ea69e3e6d68db7a9fa019d79b497f70c # v1.0.3
       with:
         username: ${{ secrets.TWINE_USERNAME }}
         password: ${{ secrets.TWINE_PASSWORD }}
