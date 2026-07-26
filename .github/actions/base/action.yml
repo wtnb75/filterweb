@@ -18,20 +18,20 @@ runs:
     - name: install jo
       run: sudo apt install -y jo
       shell: bash
-    - uses: wtnb75/actions/python@main
+    - uses: wtnb75/actions/python@c1711251ea69e3e6d68db7a9fa019d79b497f70c # v1.0.3
       with:
         #pipinstall: ".[dev,grpc,ssh,unixsock,flask]"
         pipinstall: ".[dev,ssh,unixsock,flask]"
-    - uses: wtnb75/actions/ruff@main
-    - uses: wtnb75/actions/pytest@main
+    - uses: wtnb75/actions/ruff@c1711251ea69e3e6d68db7a9fa019d79b497f70c # v1.0.3
+    - uses: wtnb75/actions/pytest@c1711251ea69e3e6d68db7a9fa019d79b497f70c # v1.0.3
     - id: wheel
-      uses: wtnb75/actions/wheel@main
-    - uses: wtnb75/actions/merge-pages@main
+      uses: wtnb75/actions/wheel@c1711251ea69e3e6d68db7a9fa019d79b497f70c # v1.0.3
+    - uses: wtnb75/actions/merge-pages@c1711251ea69e3e6d68db7a9fa019d79b497f70c # v1.0.3
       with:
         dirs: "cover"
         pydist: dist
     - id: docker
-      uses: wtnb75/actions/docker@main
+      uses: wtnb75/actions/docker@c1711251ea69e3e6d68db7a9fa019d79b497f70c # v1.0.3
       with:
         password: ${{ inputs.gh_token }}
         context: ./docker
