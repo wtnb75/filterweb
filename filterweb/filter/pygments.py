@@ -1,16 +1,17 @@
-from .filter import FilterBase
-from pygments import highlight
-from pygments.lexers import get_lexer_by_name, guess_lexer
-from pygments.formatters import get_formatter_by_name
-from typing import Optional
 from dataclasses import dataclass
+
+from pygments import highlight
+from pygments.formatters import get_formatter_by_name
+from pygments.lexers import get_lexer_by_name, guess_lexer
+
 from ..trace import tracer
+from .filter import FilterBase
 
 
 @dataclass
 class FilterPygmentsArg:
     formatter: str
-    lexer: Optional[str] = None
+    lexer: str | None = None
 
 
 class FilterPygments(FilterBase):

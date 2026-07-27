@@ -1,8 +1,9 @@
-from typing import Union
-from ..base import Base
 from abc import ABCMeta, abstractmethod
-import jsonpointer
 from logging import getLogger
+
+import jsonpointer
+
+from ..base import Base
 from ..trace import tracer
 
 _log = getLogger(__name__)
@@ -19,9 +20,9 @@ class ServeBase(Base, metaclass=ABCMeta):
 
     @tracer.start_as_current_span("process")
     def process(self, sources: list[dict], filters: list[dict]):
-        from ..index import open_input, open_filter
+        from ..index import open_filter, open_input
 
-        data: Union[None, list, dict] = None
+        data: None | list | dict = None
         for i in sources:
             i2 = i.copy()
             name = i2.pop("name", "http")

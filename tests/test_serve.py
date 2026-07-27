@@ -1,11 +1,13 @@
 import importlib.util
-import unittest
-import tempfile
-import filterweb
 import json
-import time
+import tempfile
 import threading
+import time
+import unittest
+
 import requests
+
+import filterweb
 
 
 class TestServeHTTP(unittest.TestCase):
@@ -18,7 +20,7 @@ class TestServeHTTP(unittest.TestCase):
         self.url = f"http://{self.srv.server.server_address[0]}:{self.srv.server.server_address[1]}/"
 
     def setUp(self):
-        self.tf = tempfile.NamedTemporaryFile("r+")
+        self.tf = tempfile.NamedTemporaryFile("r+")  # noqa: SIM115 -- kept open across test methods, closed in tearDown
         json.dump({"hello": "world"}, self.tf)
         self.tf.flush()
         config = {
@@ -134,5 +136,5 @@ class TestServeFlaskWaitress(TestServeHTTP):
         while not hasattr(self.srv, "server"):
             time.sleep(0.5)
         self.srv.server.print_listen("Serving on {}:{}")
-        efl = [x for x in self.srv.server.effective_listen if x[0][0][0] not in "[:"][0]
+        efl = next(x for x in self.srv.server.effective_listen if x[0][0][0] not in "[:")
         self.url = f"http://{efl[0]}:{efl[1]}/"

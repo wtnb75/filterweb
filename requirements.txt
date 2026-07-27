@@ -1,8 +1,0 @@
-click
-PyYAML
-requests
-jinja2
-xmltodict
-jsonpointer
-dacite
-pygments

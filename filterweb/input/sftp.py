@@ -1,7 +1,10 @@
-from .input import InputBase, input_arg
+from dataclasses import dataclass, field
+from typing import ClassVar
+
 import paramiko
-from dataclasses import field, dataclass
+
 from ..trace import tracer
+from .input import InputBase, input_arg
 
 
 @input_arg
@@ -16,7 +19,7 @@ class InputSFTPArg:
 class InputSFTP(InputBase):
     config_cls = InputSFTPArg
 
-    missing_host_key_map = {
+    missing_host_key_map: ClassVar[dict] = {
         "Warning": paramiko.WarningPolicy,
         "AutoAdd": paramiko.AutoAddPolicy,
         "Reject": paramiko.RejectPolicy,

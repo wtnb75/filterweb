@@ -1,8 +1,9 @@
-from .filter import FilterBase
 import subprocess
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from logging import getLogger
+
 from ..trace import tracer
+from .filter import FilterBase
 
 _log = getLogger(__name__)
 

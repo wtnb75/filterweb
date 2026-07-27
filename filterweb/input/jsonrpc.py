@@ -1,7 +1,9 @@
-from .input import InputBase, input_arg
-import requests
 from dataclasses import dataclass
+
+import requests
+
 from ..trace import tracer
+from .input import InputBase, input_arg
 
 
 @input_arg

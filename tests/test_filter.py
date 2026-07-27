@@ -1,6 +1,7 @@
-import unittest
 import os
 import tempfile
+import unittest
+
 import filterweb.filter
 
 

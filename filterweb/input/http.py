@@ -1,8 +1,9 @@
-from .input import InputBase, input_arg
-import requests
 from dataclasses import dataclass
-from typing import Optional
 from logging import getLogger
+
+import requests
+
+from .input import InputBase, input_arg
 
 _log = getLogger(__name__)
 try:
@@ -19,7 +20,7 @@ except ImportError:
 class InputHTTPArg:
     url: str
     method: str = "GET"
-    params: Optional[dict] = None
+    params: dict | None = None
 
 
 class InputHTTP(InputBase):

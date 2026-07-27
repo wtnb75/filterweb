@@ -1,7 +1,8 @@
-from .input import InputBase, input_arg
 import sqlite3
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from logging import getLogger
+
+from .input import InputBase, input_arg
 
 _log = getLogger(__name__)
 try:

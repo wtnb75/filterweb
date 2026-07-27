@@ -1,0 +1,75 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "filterweb"
+dynamic = ["version"]
+description = "web + filter"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "Watanabe Takashi", email = "wtnb75@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "click",
+    "pyyaml",
+    "requests",
+    "jinja2",
+    "xmltodict",
+    "jsonpointer",
+    "dacite",
+    "pygments",
+]
+
+[project.optional-dependencies]
+flask = [
+    "flask",
+    "waitress",
+    "gunicorn",
+]
+grpc = [
+    "grpc-requests",
+]
+ssh = [
+    "paramiko",
+]
+unixsock = [
+    "requests-unixsocket",
+]
+
+[project.scripts]
+filterweb = "filterweb._cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/wtnb75/filterweb"
+
+[tool.hatch.version]
+path = "filterweb/_version.py"
+pattern = "VERSION = ['\"](?P<version>[^'\"]+)['\"]"
+
+[tool.hatch.build.targets.wheel]
+packages = ["filterweb"]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-github-actions-annotate-failures",
+    "ruff",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
+addopts = "--cov-report=html:cover --cov-report=term --cov-branch --cov-reset --cov=filterweb"

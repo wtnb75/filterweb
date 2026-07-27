@@ -1,14 +1,15 @@
 import functools
-from typing import Optional
+from logging import getLogger
+
 import click
 import yaml
+
 from ._version import VERSION
-from logging import getLogger
 
 _log = getLogger(__name__)
 
 
-def set_verbose(verbose: Optional[bool]):
+def set_verbose(verbose: bool | None):
     from logging import basicConfig
 
     fmt = "%(asctime)s %(levelname)s %(name)s %(message)s"
@@ -77,11 +78,11 @@ def filter_test(name, config, arg):
 def server_test(name, config):
     try:
         from opentelemetry import trace
-        from opentelemetry.sdk.trace import TracerProvider
-        from opentelemetry.sdk.trace.export import BatchSpanProcessor
         from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
             OTLPSpanExporter,
         )
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
         tracer_provider = TracerProvider()
         tracer_provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
@@ -89,7 +90,6 @@ def server_test(name, config):
         _log.info("tracer loaded provider=%s", trace.get_tracer_provider())
     except ImportError:
         _log.info("tracer cannot loaded")
-        pass
 
     from .index import open_serve
 

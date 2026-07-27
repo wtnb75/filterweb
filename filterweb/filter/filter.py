@@ -1,5 +1,6 @@
+from abc import ABCMeta, abstractmethod
+
 from ..base import Base
-from abc import abstractmethod, ABCMeta
 
 
 class FilterBase(Base, metaclass=ABCMeta):
