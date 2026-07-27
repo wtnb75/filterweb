@@ -1,10 +1,11 @@
-import json
 import io
+import json
+from dataclasses import dataclass, field
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from logging import getLogger
-from http.server import HTTPServer, BaseHTTPRequestHandler
+
+from ..trace import context, get_context, tracer
 from .serve import ServeBase
-from dataclasses import field, dataclass
-from ..trace import tracer, get_context, context
 
 _log = getLogger(__name__)
 

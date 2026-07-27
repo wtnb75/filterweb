@@ -1,6 +1,8 @@
 import unittest
-import filterweb
+
 import dacite
+
+import filterweb
 
 
 class TestIndex(unittest.TestCase):

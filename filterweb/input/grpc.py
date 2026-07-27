@@ -1,7 +1,9 @@
-from .input import InputBase, input_arg
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
+
 from grpc_requests import Client
+
 from ..trace import tracer
+from .input import InputBase, input_arg
 
 
 @input_arg

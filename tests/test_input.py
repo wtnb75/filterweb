@@ -1,9 +1,10 @@
-import unittest
-from unittest.mock import patch, MagicMock
-import os
 import json
-import tempfile
+import os
 import sqlite3
+import tempfile
+import unittest
+from unittest.mock import MagicMock, patch
+
 import filterweb.input
 
 
@@ -55,15 +56,7 @@ class TestInput(unittest.TestCase):
 
     def test_csv(self):
         with tempfile.NamedTemporaryFile("r+") as tf:
-            tf.write(
-                "\n".join(
-                    [
-                        "title,value",
-                        "hello,1",
-                        "world,2",
-                    ]
-                )
-            )
+            tf.write("title,value\nhello,1\nworld,2")
             tf.flush()
             ifp = filterweb.input.InputFile(
                 {

@@ -1,5 +1,5 @@
 try:
-    from opentelemetry import trace, context
+    from opentelemetry import context, trace
     from opentelemetry.trace.propagation.tracecontext import (
         TraceContextTextMapPropagator,
     )

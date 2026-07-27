@@ -1,9 +1,11 @@
-from .input import InputBase, input_arg
-from typing import Optional
-import paramiko
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from logging import getLogger
+from typing import ClassVar
+
+import paramiko
+
 from ..trace import tracer
+from .input import InputBase, input_arg
 
 _log = getLogger(__name__)
 
@@ -13,18 +15,18 @@ _log = getLogger(__name__)
 class InputSSHArg:
     hostname: str
     command: str
-    input: Optional[str] = None
+    input: str | None = None
     params: dict = field(default_factory=dict)
-    env: Optional[dict] = None
+    env: dict | None = None
     get_pty: bool = False
-    timeout: Optional[int] = None
+    timeout: int | None = None
     missing_host_key: str = "Warning"
 
 
 class InputSSH(InputBase):
     config_cls = InputSSHArg
 
-    missing_host_key_map = {
+    missing_host_key_map: ClassVar[dict] = {
         "Warning": paramiko.WarningPolicy,
         "AutoAdd": paramiko.AutoAddPolicy,
         "Reject": paramiko.RejectPolicy,

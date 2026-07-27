@@ -1,9 +1,11 @@
 import functools
+from dataclasses import dataclass, field
 from logging import getLogger
+
 from flask import Flask, request
+
+from ..trace import context, get_context
 from .serve import ServeBase
-from dataclasses import field, dataclass
-from ..trace import get_context, context
 
 _log = getLogger(__name__)
 

@@ -1,7 +1,8 @@
-from .input import InputBase, input_arg
+from dataclasses import dataclass, field
 from xmlrpc.client import ServerProxy
-from dataclasses import field, dataclass
+
 from ..trace import tracer
+from .input import InputBase, input_arg
 
 
 @input_arg

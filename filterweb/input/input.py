@@ -1,14 +1,15 @@
-from ..base import Base
-from abc import ABCMeta, abstractmethod
-from typing import Union, Optional
 import csv
 import json
-import yaml
-import xmltodict
-import jsonpointer
 import re
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from logging import getLogger
+
+import jsonpointer
+import xmltodict
+import yaml
+
+from ..base import Base
 from ..trace import tracer
 
 _log = getLogger(__name__)
@@ -17,10 +18,10 @@ _log = getLogger(__name__)
 def input_arg(c):
     @dataclass
     class wrap(c):
-        dest: Union[str, int, None] = None
-        parse: Optional[str] = None
-        select: Optional[str] = None
-        convert_params: Optional[dict] = None
+        dest: str | int | None = None
+        parse: str | None = None
+        select: str | None = None
+        convert_params: dict | None = None
         __qualname__ = c.__qualname__
 
     return wrap
@@ -36,17 +37,17 @@ class InputBase(Base, metaclass=ABCMeta):
     config_cls = InputArg
 
     @abstractmethod
-    def read(self) -> Union[dict, str]:
+    def read(self) -> dict | str:
         pass
 
     @tracer.start_as_current_span(__name__)
-    def convert(self, data: Union[dict, str]) -> Union[dict, str]:
+    def convert(self, data: dict | str) -> dict | str:
         if isinstance(data, (str, bytes)):
             def_parse = "json"
         else:
             def_parse = "raw"
         parse = getattr(self.config, "parse", def_parse)
-        conv_params = getattr(self.config, "convert_params") or {}
+        conv_params = self.config.convert_params or {}
         if parse is None:
             parse = def_parse
         if parse == "json":
@@ -77,11 +78,11 @@ class InputBase(Base, metaclass=ABCMeta):
         else:
             res = data
         _log.debug("data: %s", res)
-        ptr = getattr(self.config, "select")
+        ptr = self.config.select
         if ptr:
             res = jsonpointer.resolve_pointer(res, ptr)
             _log.debug("selected: %s", res)
         return res
 
-    def process(self) -> Union[dict, str]:
+    def process(self) -> dict | str:
         return self.convert(self.read())

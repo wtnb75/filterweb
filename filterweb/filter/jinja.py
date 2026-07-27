@@ -1,8 +1,9 @@
-from .filter import FilterBase
-from jinja2 import Template, Environment, FileSystemLoader
-from typing import Optional, Union
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from logging import getLogger
+
+from jinja2 import Environment, FileSystemLoader, Template
+
+from .filter import FilterBase
 
 _log = getLogger(__name__)
 try:
@@ -16,12 +17,12 @@ except ImportError:
 
 @dataclass
 class FilterJinjaArg:
-    template: Optional[str] = None
-    template_file: Optional[str] = None
+    template: str | None = None
+    template_file: str | None = None
     template_basedir: str = "./"
-    base_key: Optional[str] = None
+    base_key: str | None = None
     params: dict = field(default_factory=dict)
-    vars: Union[list, dict, None] = None
+    vars: list | dict | None = None
 
 
 class FilterJinja(FilterBase):

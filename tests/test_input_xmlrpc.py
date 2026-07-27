@@ -1,7 +1,8 @@
-import unittest
 import threading
+import unittest
+from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
+
 import filterweb.input
-from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 
 
 class RequestHandler(SimpleXMLRPCRequestHandler):

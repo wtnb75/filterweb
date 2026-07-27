@@ -1,12 +1,12 @@
-from typing import Optional, Union
 from dataclasses import is_dataclass
+
 from dacite import from_dict
 
 
 class Base:
     config_cls = None
-    config: Union[config_cls, dict, None] = None
-    name: Optional[str] = None
+    config: config_cls | dict | None = None
+    name: str | None = None
 
     def __init__(self, config: dict):
         if is_dataclass(self.config_cls):

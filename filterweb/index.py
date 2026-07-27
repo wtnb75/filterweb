@@ -1,7 +1,8 @@
+from logging import getLogger
+
 from . import filter as fw_filter
 from . import input as fw_input
 from . import serve as fw_serve
-from logging import getLogger
 
 _log = getLogger(__name__)
 

@@ -1,8 +1,10 @@
-from .input import InputBase, input_arg
 import os
 import urllib.parse
-import requests_unixsocket
 from dataclasses import dataclass
+
+import requests_unixsocket
+
+from .input import InputBase, input_arg
 
 
 @input_arg

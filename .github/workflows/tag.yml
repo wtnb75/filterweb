@@ -5,6 +5,10 @@ on:
     tags:
     - 'v*'
 
+permissions:
+  packages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -12,13 +16,35 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     - name: versioning
       run: "echo \"VERSION = '${GITHUB_REF##*/v}'\" > filterweb/_version.py"
-    - id: base
-      uses: ./.github/actions/base
+    - name: apt update
+      run: sudo apt update
+      shell: bash
+    - name: install jo
+      run: sudo apt install -y jo
+      shell: bash
+    - uses: wtnb75/actions/python@9789197715f5a6b54a25832ce27193be50662266 # v1.0.4
       with:
-        gh_token: ${{ secrets.GITHUB_TOKEN }}
-    - uses: wtnb75/actions/pypi-upload@c1711251ea69e3e6d68db7a9fa019d79b497f70c # v1.0.3
+        extra-args: "--extra ssh --extra unixsock --extra flask"
+    - uses: wtnb75/actions/ruff@9789197715f5a6b54a25832ce27193be50662266 # v1.0.4
+    - uses: wtnb75/actions/pytest@9789197715f5a6b54a25832ce27193be50662266 # v1.0.4
+    - id: wheel
+      uses: wtnb75/actions/wheel@9789197715f5a6b54a25832ce27193be50662266 # v1.0.4
+    - uses: wtnb75/actions/merge-pages@9789197715f5a6b54a25832ce27193be50662266 # v1.0.4
+      with:
+        dirs: "cover"
+        pydist: dist
+    - id: docker
+      uses: wtnb75/actions/docker@9789197715f5a6b54a25832ce27193be50662266 # v1.0.4
+      with:
+        password: ${{ secrets.GITHUB_TOKEN }}
+        context: ./docker
+        build-args: |
+          GH_BRANCH=${{ github.ref_name }}
+        push: true
+        image-version: ${{ github.ref_name }}
+    - uses: wtnb75/actions/pypi-upload@9789197715f5a6b54a25832ce27193be50662266 # v1.0.4
       with:
         username: ${{ secrets.TWINE_USERNAME }}
         password: ${{ secrets.TWINE_PASSWORD }}
         repository_url: ${{ secrets.TWINE_REPOSITORY_URL }}
-        file: dist/${{ steps.base.outputs.wheel }}
+        file: dist/${{ steps.wheel.outputs.filename }}
