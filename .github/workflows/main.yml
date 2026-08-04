@@ -28,7 +28,7 @@ jobs:
     - uses: wtnb75/actions/pytest@v1
     - id: wheel
       uses: wtnb75/actions/wheel@v1
-    - uses: wtnb75/actions/merge-pages@9789197715f5a6b54a25832ce27193be50662266 # v1.0.4
+    - uses: wtnb75/actions/merge-pages@v1
       with:
         dirs: "cover"
         pydist: dist
