@@ -101,11 +101,11 @@ class TestServeHTTP(unittest.TestCase):
 
     def test_file2source(self):
         res = requests.get(self.url + "source")
-        self.assertIn("&quot;hello&quot;", res.text)
+        self.assertIn('"hello"', res.text)
 
     def test_file2source_nolex(self):
         res = requests.get(self.url + "source/nolex")
-        self.assertIn("{&quot;hello&quot;: &quot;world&quot;}", res.text)
+        self.assertIn('{"hello": "world"}', res.text)
 
 
 @unittest.skipUnless(hasattr(filterweb.serve, "ServeFlask"), "no flask installed")
